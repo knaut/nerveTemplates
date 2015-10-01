@@ -846,6 +846,7 @@ function generateTemplateString( template ) {
 
       }
     }
-
   }
+
+  return $root;
 }
