@@ -743,25 +743,29 @@ returns an object like:
 
 */
 
-function conc( selector ) {
+function generateTag( selector ) {
   var parsed = peg.parse( selector );
   var string = '';
 
+  var tagName;
   // first place in the object is the tag name
   if (parsed[0] === null) {
       // no el specified, default to div
-      string += '<div';
+      tagName = 'div';
+      string += '<' + tagName;
   } else if ( typeof parsed[0] === 'string' ) {
     
     if (parsed[0][0].toUpperCase() === parsed[0][0]) {
       
       // if uppercase/PascalCase, it's a component
-      console.log('component')
+      console.log('component');
+      return;
       // at this point we would evaluate the name as a component reference. the parent component would then apply this reference when it encounters a prop attribute with this key
 
     } else {
       // it's an element
-      string += '<' + parsed[0];
+      tagName = parsed[0];
+      string += '<' + tagName;
     }
   }
 
@@ -773,13 +777,12 @@ function conc( selector ) {
   // third place could be classes or custom attributes (pseudo elements won't be supported, since we're generating elements, not selecting them)
   if (parsed[2].length) {
     
-    var classes = [];
-    var attrs = [];
     var attrReg = /[a-z-]+/gi;
 
+    classes = [];
+    attrs = [];
+
     for (var p = 0; parsed[2].length > p; p++) {
-      
-     
 
       if (parsed[2][p].indexOf('.') > -1) {
         // if the string has a ., we will assume it's a css class
@@ -788,7 +791,6 @@ function conc( selector ) {
       } 
 
       if (parsed[2][p].indexOf('[') > -1) {
-        console.log(parsed[2][p]);
         var attr = parsed[2][p];
         var attrKey = attr.match(attrReg)[0];
         var attrVal = attr.match(attrReg)[1];
@@ -797,20 +799,53 @@ function conc( selector ) {
         attrs.push(attr);
       }
     }
+
+    if (classes.length) {
+      classes = 'class="' + classes.join(' ') + '"';
+      string += ' ' + classes;
+    }
+
+    if (attrs.length) {
+      attrs = attrs.join(' ');
+      string += ' ' + attrs;
+    }
   }
 
-  if (classes.length) {
-    classes = 'class="' + classes.join(' ') + '"';
-    string += ' ' + classes;
-  } 
+  
 
-  if (attrs.length) {
-    attrs = attrs.join(' ');
-    string += ' ' + attrs;
-  }
-
-  string += '>'
+  string += '></' + tagName + '>';
 
   return string;
 }
 
+template = {
+  '#root': {
+    'span': 'this is just a test template',
+    'div#amazing.my-other-class': 'a series of nested elements…'
+  }
+}
+
+function generateTemplateString( template ) {
+  var $root;
+
+  for (var prop in template) {
+    $root = $( generateTag(prop) );
+
+    var childKeys = Object.keys(template[prop]);
+    
+    if (childKeys.length) {
+
+      for (var child in template[prop]) {
+
+        if (typeof template[prop][child] === 'string') {
+          var $child = $( generateTag(child) ).text( template[prop][child] )
+          $root.append( $child );
+        } else {
+          console.log('got a nested object!')
+        }
+
+      }
+    }
+
+  }
+}
