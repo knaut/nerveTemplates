@@ -820,13 +820,35 @@ function generateTag( selector ) {
 
 template = {
 	'#root': {
+		'div': 'blah',
+		'div': 'blah',
+		'div': 'blah',
 		'span': 'this is just a test template',
 		'div#amazing.my-other-class': 'a series of nested elements…',
 		'nav': {
 			'span': 'this is a nested child'
-		}
+		},
+		'div': 'blah',
 	}
 }
+
+// javascript doesn't do object literals with the same key name
+// this might be rare in the day-to-day, but still a downer
+// a workaround could be to wrap the container el that has multiple els of the same selector in an array, and turn the enclosing key/vals into objects
+
+template = {
+	'#root': [
+		{ 'div': 'blah' },
+		{ 'div': 'blah' },
+		{ 'div': 'blah' },
+		{ 'span': 'this is just a test template' },
+		{ 'div#amazing.my-other-class': 'a series of nested elements…' },
+		{ 'nav': {
+			'span': 'this is a nested child'
+		},
+		{ 'div': 'blah' }
+	]
+};
 
 function generateTemplateString( template ) {
 	var $root;
@@ -859,54 +881,39 @@ function gen( obj ) {
 	
 	var $child;
 	var children = [];
-	for (var child in obj) {
+
+	for (var i = 0; Object.keys(obj).length > i; i++) {
+		var child = Object.keys(obj)[i];
 		
-		console.log(child)
-
-		if (typeof obj[child] === 'string') {
-			console.log(child, 'is string')
-
+		if ( typeof obj[child] === 'string') {
+			
 			$child = $( generateTag(child) ).append( obj[child] );
-			
-			
-
 		} else {
-			console.log('got a nested object!', child);
-			// console.log( Object.keys( obj[child] ) )
-			
+
 			$child = $( generateTag(child) );
 			$child.append( gen( obj[child] ) );
-
-			// if (!$child) {
-			// 	console.log('child not set', child)
-			// 	$child = $( generateTag(child) );
-
-			// 	$child.append( gen( obj[child] ) );	
-			// } else {
-			// 	var $subchild = $( generateTag(child) );
-			// 	$subchild.append( gen( obj[child] ) );
-			// 	$child.append( $subchild );
-			// }
-			
-
-			// if ($child) {
-
-			// 	$child.append( gen( obj[child] ) );
-			// 	console.log('straight append', $child[0]);
-
-			// } else {
-			// 	// var $newChild.append( generateTag(child) );
-			// 	console.log('nested append', $child[0]);
-
-			// 	$child.append( gen( obj[child] ) );
-			// }
 		}
 
 		children.push( $child );
-
 	}
 
-	console.log(children)
+	// for (var child in obj) {
+		
+	// 	if (typeof obj[child] === 'string') {
+
+	// 		$child = $( generateTag(child) ).append( obj[child] );
+
+	// 	} else {
+			
+	// 		$child = $( generateTag(child) );
+	// 		$child.append( gen( obj[child] ) );
+
+	// 	}
+
+		
+
+	// }
+
 	return children;
 }
 
