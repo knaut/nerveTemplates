@@ -821,14 +821,22 @@ function generateTag( selector ) {
 template = {
 	'#root': {
 		'div': 'blah',
-		'div': 'blah',
-		'div': 'blah',
+		'header': {
+			'div#test': 'test',
+			'div#blah': { 
+				'span#meh': 'blah blah'
+			}
+		},
 		'span': 'this is just a test template',
 		'div#amazing.my-other-class': 'a series of nested elements…',
 		'nav': {
 			'span': 'this is a nested child'
 		},
-		'div': 'blah',
+		'footer#test': {
+			'ul': {
+				'li#test': 'span'
+			}
+		}
 	}
 }
 
@@ -836,7 +844,7 @@ template = {
 // this might be rare in the day-to-day, but still a downer
 // a workaround could be to wrap the container el that has multiple els of the same selector in an array, and turn the enclosing key/vals into objects
 
-template = {
+template2 = {
 	'#root': [
 		{ 'div': 'blah' },
 		{ 'div': 'blah' },
@@ -845,85 +853,66 @@ template = {
 		{ 'div#amazing.my-other-class': 'a series of nested elements…' },
 		{ 'nav': {
 			'span': 'this is a nested child'
+			}
 		},
-		{ 'div': 'blah' }
+		{ 'div': 'blah' },
+		[
+			{ 'header': {
+				'div#test': 'test',
+				'div#blah': { 
+					'span#meh': 'blah blah'
+				}
+			}},
+			{'footer#test': {
+				'ul': {
+					'li#test': 'span'
+				}
+			}}
+		]
 	]
 };
 
-function generateTemplateString( template ) {
-	var $root;
-
-	for (var prop in template) {
-		$root = $( generateTag(prop) );
-
-		var childKeys = Object.keys(template[prop]);
-		
-		if (childKeys.length) {
-
-			for (var child in template[prop]) {
-
-				if (typeof template[prop][child] === 'string') {
-					var $child = $( generateTag(child) ).text( template[prop][child] )
-					$root.append( $child );
-				} else {
-					console.log('got a nested object!', template[prop][child]);
-					generateTemplateString( template[prop][child] );
-				}
-
-			}
-		}
-	}
-
-	return $root;
-}
-
 function gen( obj ) {
-	
-	var $child;
 	var children = [];
 
-	for (var i = 0; Object.keys(obj).length > i; i++) {
-		var child = Object.keys(obj)[i];
-		
-		if ( typeof obj[child] === 'string') {
+	if (obj.hasOwnProperty('length')) {
+		for ( var n = 0; obj.length > n; n++) {
+			var $child;
+			var child = obj[n];
 			
-			$child = $( generateTag(child) ).append( obj[child] );
-		} else {
+			if (typeof child === 'string') {
+				// literal string in the array
+			} else if (typeof child === 'object') {
 
-			$child = $( generateTag(child) );
-			$child.append( gen( obj[child] ) );
+				$child = gen( obj[n] );
+			}
+
+			children.push( $child[0] );
 		}
 
-		children.push( $child );
-	}
-
-	// for (var child in obj) {
+	} else {
 		
-	// 	if (typeof obj[child] === 'string') {
+		for (var i = 0; Object.keys(obj).length > i; i++) {
+			var $child;
+			var child = Object.keys(obj)[i];
 
-	// 		$child = $( generateTag(child) ).append( obj[child] );
+			if ( typeof obj[child] === 'string') {
+				
+				$child = $( generateTag(child) ).append( obj[child] );
+				
+				children.push( $child );
+			} else if (typeof obj[child] === 'object') {
 
-	// 	} else {
+				$child = $( generateTag(child) );
+				$child.append( gen( obj[child] ) );
+				
+				children.push( $child );
+			}
+
 			
-	// 		$child = $( generateTag(child) );
-	// 		$child.append( gen( obj[child] ) );
-
-	// 	}
-
-		
-
-	// }
+		}
+	}
 
 	return children;
 }
-
-/*
-
-* get this tag, set as root
-	call yourself if these children( pass in this root )
-		if children, attach children to root
-
-		*/
-
-
 
