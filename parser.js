@@ -746,8 +746,8 @@ returns an object like:
 function generateTag( selector ) {
 	var parsed = peg.parse( selector );
 	var string = '';
-
 	var tagName;
+	
 	// first place in the object is the tag name
 	if (parsed[0] === null) {
 			// no el specified, default to div
