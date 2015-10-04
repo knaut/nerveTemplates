@@ -753,45 +753,45 @@ var render = function(template, data) {
 // normalize an object into an array
 
 testArr1 = {
-	'#a': [
+	'#a.foo[data-val="1"]': [
 		{ 'div': 'test text' },
 		{ 'div': 'other text' }
 	],
-	'#b': [
+	'#b.bar[data-val=2]': [
 		{ 'div': 'test text' },
 		{ 'div': 'other text' }
 	],
-	'#c': [
+	'#c.baz.banksy[data-val=3]': [
 		{ 'div': 'test text' },
 		{ 'div': 'other text' }
 	]
 }
 
 testArr2 = {
-	'#a': {
+	'#a.foo[data-val=1]': {
 		'div#first': 'test text',
 		'div#second': 'other text'
 	},
-	'#b': {
+	'#b.bar[data-val=2]': {
 		'div#first': 'test text',
 		'div#second': 'other text'
 	},
-	'#c': {
+	'#c.baz.banksy[data-val=3]': {
 		'div#first': 'test text',
 		'div#second': 'other text'
 	}
 }
 
 testArr3 = {
-	'#a': [
+	'#a.foo[data-val=1]': [
 		'div:test text',
 		'div:other text'
 	],
-	'#b': [
+	'#b.bar[data-val=2]': [
 		'div:test text',
 		'div:other text'
 	],
-	'#c': [
+	'#c.baz.banksy[data-val=3]': [
 		'div:test text',
 		'div:other text'
 	]
@@ -862,15 +862,37 @@ arrify = function( struct ) {
 			var parsed = peg.parse( key );	
 			
 			// prepare to parse classes and custom attrs
-			var attrReg = /[a-z-]+/gi;
+			var attrsClasses = parsed[2];
+			var attrReg = /[\d\w\s-]+/gi;
 			var classes = [];
 			var attrs = [];
 
+			for (var c = 0; attrsClasses.length > c; c++) {
+				if (attrsClasses[c].indexOf('.') > -1) {
+					// if the string has a ., we will assume it's a css class
+					var className = attrsClasses[c].split('.')[1];
+					classes.push( className );
+				}
 
+				if (attrsClasses[c].indexOf('[') > -1) {
+					// assume attribute based on usual selector
+					var attr = attrsClasses[c];
+					var attrKey = attr.match(attrReg)[0];
+					var attrVal = attr.match(attrReg)[1];
+
+					// store the attribute as a map for string concat later
+					var attrMap = {};
+					attrMap[attrKey] = attrVal;
+					attrs.push(attrMap);
+				}
+			}
+
+			// re-set the parsed var with a map of everything parsed
 			parsed = {
 				tagName: parsed[0] ? null : 'div',
 				id: parsed[1],
-				classes: parsed[2]
+				classes: classes,
+				attrs: attrs
 			}
 
 			console.log(parsed);
