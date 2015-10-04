@@ -753,7 +753,7 @@ var render = function(template, data) {
 // normalize an object into an array
 
 testArr1 = {
-	'#a.foo[data-val="1"]': [
+	'#a.foo[data-val="1"][data-val="a"]': [
 		{ 'div': 'test text' },
 		{ 'div': 'other text' }
 	],
@@ -768,7 +768,7 @@ testArr1 = {
 }
 
 testArr2 = {
-	'#a.foo[data-val=1]': {
+	'#a.foo[data-val=1][data-val="a"]': {
 		'div#first': 'test text',
 		'div#second': 'other text'
 	},
@@ -783,7 +783,7 @@ testArr2 = {
 }
 
 testArr3 = {
-	'#a.foo[data-val=1]': [
+	'#a.foo[data-val=1][data-val="a"]': [
 		'div:test text',
 		'div:other text'
 	],
@@ -818,12 +818,18 @@ testArr4 = [
 	}
 ]
 
+testArr5 = [
+	'a#a.foo[data-val=1][data-val="a"]:test text'
+]
+
+testArr6 = 'span#a.foo[data-val=1][data-val="a"]:blah blah'
+
 // one loop to rule both kinds of structures, arrays and objects
 arrify = function( struct ) {
 
 	// determine type at root level
 	if (struct.hasOwnProperty('length')) {
-		if (typeof obj === 'string') {
+		if (typeof struct === 'string') {
 			var type = 'string';
 		} else {
 			var type = 'array';
@@ -849,9 +855,47 @@ arrify = function( struct ) {
 		}
 	}
 
-	// we loop through all structs at the root level,
-	// parsing the keys
+	if (type === 'array') {
+		for (var a = 0; struct.length > a; a++) {
+			var ai = struct[a];
+			console.log(typeof ai);
+			if (typeof ai === 'string') {
+
+				var obj = {};
+				var key = ai.split(/:/)[0];
+				var val = ai.split(/:/)[1];
+
+				obj[key] = val;
+
+				console.log(obj)
+
+				normalized.push( obj );
+			}
+
+			if (typeof ai === 'object') {
+				normalized.push( ai );
+			}
+		}
+	}
+
+	if (type === 'string') {
+		console.log(struct);
+		var obj = {};
+		var key = struct.split(/:/)[0];
+		var val = struct.split(/:/)[1];
+
+		obj[key] = val;
+
+		normalized.push( obj );
+	}
+
+	console.log(normalized);
+
+	// we loop through all structs at the root level
 	for (var i = 0; normalized.length > i; i++) {
+
+		
+
 		var obj = normalized[i];
 		
 		for (var key in obj) {
@@ -862,6 +906,9 @@ arrify = function( struct ) {
 			var parsed = peg.parse( key );	
 			
 			// prepare to parse classes and custom attrs
+			if (parsed[0] === null) {
+				parsed[0] = 'div';
+			}
 			var attrsClasses = parsed[2];
 			var attrReg = /[\d\w\s-]+/gi;
 			var classes = [];
@@ -889,7 +936,7 @@ arrify = function( struct ) {
 
 			// re-set the parsed var with a map of everything parsed
 			parsed = {
-				tagName: parsed[0] ? null : 'div',
+				tagName: parsed[0],
 				id: parsed[1],
 				classes: classes,
 				attrs: attrs
