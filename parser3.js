@@ -951,7 +951,7 @@ render = function( struct ) {
 			}
 
 			// grab the inner content
-			console.log(inner)
+			// console.log(inner)
 			if (inner === undefined) {
 				inner = null;
 			}
@@ -965,15 +965,29 @@ render = function( struct ) {
 				inner: inner
 			}
 
-			console.log(parsed.inner)
+			// console.log(parsed.inner)
 			
 			// beware, this will grab arrays too
-			if (typeof parsed.inner === 'object') {
-				for (var child in parsed.inner)
+			if (typeof parsed.inner === 'object' && parsed.inner !== null) {
+				
+				if (parsed.inner.length !== undefined) {
+					
+					
+				} else {
+					console.log(parsed.inner.length)
+					console.log('its an object!', parsed.inner)
 
-				children.push( render( child ) );
+					for (var child in parsed.inner) {
+						children.push( render( child ) );	
+					}
 
-				parsed.inner = children;
+					parsed.inner = children;
+
+
+				}
+
+				
+
 			} else if (parsed.inner === 'string') {
 				children = parsed.inner;
 			}
