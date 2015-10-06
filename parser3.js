@@ -947,7 +947,7 @@ normalize = function( struct ) {
 
 	// determine type at root level
 	if (struct.hasOwnProperty('length')) {
-		console.log(struct, typeof struct)
+		// console.log(struct, typeof struct)
 		if (typeof struct === 'string') {
 			var type = 'string';
 		} else {
@@ -998,7 +998,7 @@ normalize = function( struct ) {
 	if (type === 'string') {
 		// this could cause issues if there's a semi-colon in the inner text
 		if (type.indexOf(':') > -1) {
-			console.log(normalized)
+			// console.log(normalized)
 			normalized.push( struct );
 		} else {
 			var obj = {};
@@ -1111,3 +1111,57 @@ normalize = function( struct ) {
 	return newStruct;
 
 }
+
+// take the normalized, nested array of objects and output a string that can
+// be used as a template
+stringify = function( normalized ) {
+
+	var string = '';
+
+	// iterate through the parsed object and
+	// modify the string
+	for (var n = 0; normalized.length > n; n++) {
+
+		var obj = normalized[n];
+
+		string += '<' + obj.tagName;
+
+		// id attribute
+		if (obj.id) {
+			string += ' id="' + obj.id + '"';
+		}
+
+		// class attributes
+		if (obj.classes.length) {
+			string += ' class="' + obj.classes.join(' ') + '"';
+		}
+
+		// custom attributes
+		if (obj.attrs.length) {
+			// loop through array of key/vals
+			for (var a = 0; obj.attrs.length > a; a++) {
+				var attr = obj.attrs[a];
+				for (var attrKey in attr) {
+					string += ' ' + attrKey + '="' + attr[attrKey] + '"'
+				}
+			}
+		}
+
+		// end the root tag
+		string += '>';
+
+		console.log(string)
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
