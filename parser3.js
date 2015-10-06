@@ -1079,27 +1079,42 @@ normalize = function( struct ) {
 				
 				if (parsed.inner.length !== undefined) {
 
+					//  support for arbitrarily nested arrays of objects
+					var parsedInnerArr = [];	// scope a new array for later
+
 					for (var p = 0; parsed.inner.length > p; p++) {
-						children.push( normalize( parsed.inner[p] ) );
+						
+						if (typeof parsed.inner[p] === 'object' && parsed.inner[p].hasOwnProperty('length') && parsed.inner[p].length > 0) {
+
+							for (var t = 0; parsed.inner[p].length > t; t++) {
+								parsedInnerArr.push( normalize( parsed.inner[p][t] ) );
+							}
+
+						} else {
+							parsedInnerArr.push( normalize( parsed.inner[p] ) );
+						}
+						
 					}
 					
-					parsed.inner = children;
+					parsed.inner = parsedInnerArr;
 
 				} else {
-
-					for (var child in parsed.inner) {
-						children.push( normalize(child) )
-					}
+					
+					// for (var child in parsed.inner) {
+					// 	children.push( normalize(child) )
+					// }
 
 					parsed.inner = normalize( parsed.inner );
 
 				}
 
+
+
 			} else if (parsed.inner === 'string') {
 				children = parsed.inner;
 			}
 
-			newStruct.push( parsed );
+			newStruct = parsed;
 
 		}
 	
@@ -1117,6 +1132,7 @@ normalize = function( struct ) {
 stringify = function( normalized ) {
 
 	var string = '';
+	var innerChildren = [];
 
 	// iterate through the parsed object and
 	// modify the string
@@ -1132,12 +1148,12 @@ stringify = function( normalized ) {
 		}
 
 		// class attributes
-		if (obj.classes.length) {
+		if (obj.hasOwnProperty('classes') && obj.classes.length) {
 			string += ' class="' + obj.classes.join(' ') + '"';
 		}
 
 		// custom attributes
-		if (obj.attrs.length) {
+		if (obj.hasOwnProperty('attrs') && obj.attrs.length) {
 			// loop through array of key/vals
 			for (var a = 0; obj.attrs.length > a; a++) {
 				var attr = obj.attrs[a];
@@ -1150,8 +1166,21 @@ stringify = function( normalized ) {
 		// end the root tag
 		string += '>';
 
-		console.log(string)
+		if ( obj.hasOwnProperty('inner') && obj.inner.length ) {
+			console.log(obj.inner)
+
+			innerChildren.push( stringify( obj.inner ) );
+
+		}
+		
+		
+
+		// console.log(string)
 	}
+
+	// console.log(innerChildren)
+
+	return string;
 
 }
 
