@@ -909,6 +909,42 @@ testArr10 = {
 	}
 }
 
+testArr11 = {
+	'#a.foo[data-val=1][data-val="a"]': {
+		'#b.bar[data-val=2]': {
+			'#c.baz.banksy[data-val=3]': 'hello World!'
+		},
+
+		'#d.bar[data-val=4]': {
+			'#e.baz.banksy[data-val=5]': [
+				{ 'div': 'blah' },
+				{ 'div': 'blah' },
+				{ 'div': 'blah' },
+				{ 'span': 'this is just a test template' },
+				{ 'div#amazing.my-other-class': 'a series of nested elements…' },
+				{ 'nav': {
+					'span': 'this is a nested child'
+					}
+				},
+				{ 'div': 'blah' },
+				[
+					{ 'header': {
+						'div#test': 'test',
+						'div#blah': { 
+							'span#meh': 'blah blah'
+						}
+					}},
+					{'footer#test': {
+						'ul': {
+							'li#test': 'span'
+						}
+					}}
+				]
+			]
+		}
+	}
+}
+
 // one loop to rule both kinds of structures, arrays and objects
 render = function( struct ) {
 
