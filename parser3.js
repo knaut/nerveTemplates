@@ -743,12 +743,6 @@ data = {
 
 interpolate = /\{\{(.+?)\}\}/g;
 
-// put two objects together, make them into a string that could be parsed as DOM
-
-var render = function(template, data) {
-
-}
-
 
 // normalize an object into an array
 template = {
@@ -945,8 +939,11 @@ testArr11 = {
 	}
 }
 
-// one loop to rule both kinds of structures, arrays and objects
-render = function( struct ) {
+// recursively take a nested object where the keys are selectors
+// and the vals are objects, arrays, or text nodes (strings)
+// and normalize it into a consistently nested pattern of
+// arrayed objects that map easily onto DOM nodes
+normalize = function( struct ) {
 
 	// determine type at root level
 	if (struct.hasOwnProperty('length')) {
@@ -1015,20 +1012,13 @@ render = function( struct ) {
 		
 	}
 
+	// scoping an array to push parsed objects to later
 	var newStruct = [];
-
-	console.log(type, typeof normalized, normalized);
 
 	// we loop through all structs at the root level
 	for (var i = 0; normalized.length > i; i++) {
 
 		var obj = normalized[i];
-		// console.log(obj)
-
-		// scope the string
-		var string = '<';
-
-		console.log('obj', obj)
 
 		// begin parsing process
 		var children = [];
@@ -1070,8 +1060,7 @@ render = function( struct ) {
 				}
 			}
 
-			// grab the inner content
-			console.log(inner)
+			// preferring null over undefined
 			if (inner === undefined) {
 				inner = null;
 			}
@@ -1084,30 +1073,25 @@ render = function( struct ) {
 				attrs: attrs,
 				inner: inner
 			}
-
-			// console.log(parsed.inner)
 			
-			// beware, this will grab arrays too
+			// recursively build a series arrayed objects with nested children
 			if (typeof parsed.inner === 'object' && parsed.inner !== null) {
 				
 				if (parsed.inner.length !== undefined) {
-					console.log('its an array!', parsed.inner)
+
 					for (var p = 0; parsed.inner.length > p; p++) {
-						children.push( render( parsed.inner[p] ) );
+						children.push( normalize( parsed.inner[p] ) );
 					}
 					
 					parsed.inner = children;
 
 				} else {
-					// console.log(parsed.inner.length)
-					console.log('its an object!', parsed.inner)
 
 					for (var child in parsed.inner) {
-						console.log(child, render(child))
-						children.push( render(child) )
+						children.push( normalize(child) )
 					}
 
-					parsed.inner = render( parsed.inner );
+					parsed.inner = normalize( parsed.inner );
 
 				}
 
@@ -1117,43 +1101,13 @@ render = function( struct ) {
 
 			newStruct.push( parsed );
 
-			
-
-
-			// from here we can begin string concatenation
-			// string += parsed.tagName;
-			// if (parsed.id || parsed.classes.length || parsed.attrs.length) {
-
-			// } else {
-			// 	string += '>';
-			// }
-
-			// // recursively concatenate strings
-			// if (type === 'array') {
-
-			// 	for (var v = 0; struct.length > v; v++) {
-			// 		console.log(struct[v]);
-
-			// 		if (typeof struct[v] === 'object') {
-			// 			string += '</' + parsed.tagName + '>';
-			// 			string += render( struct[v] );
-			// 		}
-
-			// 		return string;
-			// 	}
-			// }
-
-			// bad
-			// if (type === 'object') {
-			// 	console.log( struct )
-			// 	string += render( struct );
-				
-			// }
 		}
 	
 	}
 
+	// the final returned structure should be a normalized pattern,
+	// where every tag's is an object whose inner content is either a 
+	// plain string (text), null, or an array of one or more tags…
 	return newStruct;
 
-	// console.log(string)
 }
