@@ -751,6 +751,60 @@ var render = function(template, data) {
 
 
 // normalize an object into an array
+template = {
+	'#root': {
+		'div': 'blah',
+		'header': {
+			'div#test': 'test',
+			'div#blah': { 
+				'span#meh': 'blah blah'
+			}
+		},
+		'span': 'this is just a test template',
+		'div#amazing.my-other-class': 'a series of nested elements…',
+		'nav': {
+			'span': 'this is a nested child'
+		},
+		'footer#test': {
+			'ul': {
+				'li#test': 'span'
+			}
+		}
+	}
+}
+
+// javascript doesn't do object literals with the same key name
+// this might be rare in the day-to-day, but still a downer
+// a workaround could be to wrap the container el that has multiple els of the same selector in an array, and turn the enclosing key/vals into objects
+
+template2 = {
+	'#root': [
+		{ 'div': 'blah' },
+		{ 'div': 'blah' },
+		{ 'div': 'blah' },
+		{ 'span': 'this is just a test template' },
+		{ 'div#amazing.my-other-class': 'a series of nested elements…' },
+		{ 'nav': {
+			'span': 'this is a nested child'
+			}
+		},
+		{ 'div': 'blah' },
+		[
+			{ 'header': {
+				'div#test': 'test',
+				'div#blah': { 
+					'span#meh': 'blah blah'
+				}
+			}},
+			{'footer#test': {
+				'ul': {
+					'li#test': 'span'
+				}
+			}}
+		]
+	]
+};
+
 
 testArr1 = {
 	'#a.foo[data-val="1"][data-val="a"]': [
@@ -843,6 +897,18 @@ testArr9 = {
 	}
 }
 
+testArr10 = {
+	'#a.foo[data-val=1][data-val="a"]': {
+		'#b.bar[data-val=2]': {
+			'#c.baz.banksy[data-val=3]': 'hello World!'
+		},
+
+		'#d.bar[data-val=4]': {
+			'#e.baz.banksy[data-val=5]': 'hello Waldo!'
+		}
+	}
+}
+
 // one loop to rule both kinds of structures, arrays and objects
 render = function( struct ) {
 
@@ -897,6 +963,7 @@ render = function( struct ) {
 	}
 
 	if (type === 'string') {
+		// this could cause issues if there's a semi-colon in the inner text
 		if (type.indexOf(':') > -1) {
 			console.log(normalized)
 			normalized.push( struct );
@@ -999,13 +1066,12 @@ render = function( struct ) {
 					// console.log(parsed.inner.length)
 					console.log('its an object!', parsed.inner)
 
-					
-					// for (var child in parsed.inner) {
-					// 	console.log(child, render(child))
-						
-					// }
+					for (var child in parsed.inner) {
+						console.log(child, render(child))
+						children.push( render(child) )
+					}
 
-					parsed.inner = render( parsed.inner );;
+					parsed.inner = render( parsed.inner );
 
 				}
 
