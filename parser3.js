@@ -799,19 +799,19 @@ testArr3 = {
 
 testArr4 = [
 	{ 
-		'div': [
+		'#a.foo[data-val=1][data-val="a"]': [
 			'div:test text',
 			'div:other text'
 		]
 	},
 	{ 
-		'div': [
+		'#b.bar[data-val=2]': [
 			'div:test text',
 			'div:other text'
 		]
 	},
 	{ 
-		'div': [
+		'#c.baz.banksy[data-val=3]': [
 			'div:test text',
 			'div:other text'
 		]
@@ -824,8 +824,19 @@ testArr5 = [
 
 testArr6 = 'span#a.foo[data-val=1][data-val="a"]:blah blah'
 
+testArr7 = 'div'
+
+testArr8 = [
+	{ 
+		'div': 'test'
+	},
+	{ 
+		'div': 'test'
+	}
+]
+
 // one loop to rule both kinds of structures, arrays and objects
-arrify = function( struct ) {
+render = function( struct ) {
 
 	// determine type at root level
 	if (struct.hasOwnProperty('length')) {
@@ -858,7 +869,7 @@ arrify = function( struct ) {
 	if (type === 'array') {
 		for (var a = 0; struct.length > a; a++) {
 			var ai = struct[a];
-			console.log(typeof ai);
+
 			if (typeof ai === 'string') {
 
 				var obj = {};
@@ -866,8 +877,6 @@ arrify = function( struct ) {
 				var val = ai.split(/:/)[1];
 
 				obj[key] = val;
-
-				console.log(obj)
 
 				normalized.push( obj );
 			}
@@ -879,7 +888,6 @@ arrify = function( struct ) {
 	}
 
 	if (type === 'string') {
-		console.log(struct);
 		var obj = {};
 		var key = struct.split(/:/)[0];
 		var val = struct.split(/:/)[1];
@@ -889,23 +897,31 @@ arrify = function( struct ) {
 		normalized.push( obj );
 	}
 
-	console.log(normalized);
+	var newStruct = [];
 
 	// we loop through all structs at the root level
 	for (var i = 0; normalized.length > i; i++) {
 
-		
-
 		var obj = normalized[i];
-		
+		// console.log(obj)
+
+		// scope the string
+		var string = '<';
+
+		console.log('obj', obj)
+
+		// begin parsing process
+		var children = [];
+
 		for (var key in obj) {
 			
 			var tag = key;			// css-like selector
 			var inner = obj[key];	// innerHtml content
 
+			// we rely on a generated peg parser for css selector parsing for now
 			var parsed = peg.parse( key );	
 			
-			// prepare to parse classes and custom attrs
+			// prepare to refine parsed classes and custom attrs
 			if (parsed[0] === null) {
 				parsed[0] = 'div';
 			}
@@ -934,19 +950,73 @@ arrify = function( struct ) {
 				}
 			}
 
+			// grab the inner content
+			console.log(inner)
+			if (inner === undefined) {
+				inner = null;
+			}
+
 			// re-set the parsed var with a map of everything parsed
 			parsed = {
 				tagName: parsed[0],
 				id: parsed[1],
 				classes: classes,
-				attrs: attrs
+				attrs: attrs,
+				inner: inner
 			}
 
-			console.log(parsed);
+			console.log(parsed.inner)
+			
+			// beware, this will grab arrays too
+			if (typeof parsed.inner === 'object') {
+				for (var child in parsed.inner)
 
+				children.push( render( child ) );
+
+				parsed.inner = children;
+			} else if (parsed.inner === 'string') {
+				children = parsed.inner;
+			}
+
+			newStruct.push( parsed );
+
+			
+
+
+			// from here we can begin string concatenation
+			// string += parsed.tagName;
+			// if (parsed.id || parsed.classes.length || parsed.attrs.length) {
+
+			// } else {
+			// 	string += '>';
+			// }
+
+			// // recursively concatenate strings
+			// if (type === 'array') {
+
+			// 	for (var v = 0; struct.length > v; v++) {
+			// 		console.log(struct[v]);
+
+			// 		if (typeof struct[v] === 'object') {
+			// 			string += '</' + parsed.tagName + '>';
+			// 			string += render( struct[v] );
+			// 		}
+
+			// 		return string;
+			// 	}
+			// }
+
+			// bad
+			// if (type === 'object') {
+			// 	console.log( struct )
+			// 	string += render( struct );
+				
+			// }
 		}
 	
 	}
 
+	return newStruct;
 
+	// console.log(string)
 }
