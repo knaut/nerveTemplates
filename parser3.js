@@ -971,10 +971,15 @@ render = function( struct ) {
 			if (typeof parsed.inner === 'object' && parsed.inner !== null) {
 				
 				if (parsed.inner.length !== undefined) {
+					console.log('its an array!', parsed.inner)
+					for (var p = 0; parsed.inner.length > p; p++) {
+						children.push( render( parsed.inner[p] ) );
+					}
 					
-					
+					parsed.inner = children;
+
 				} else {
-					console.log(parsed.inner.length)
+					// console.log(parsed.inner.length)
 					console.log('its an object!', parsed.inner)
 
 					for (var child in parsed.inner) {
@@ -983,10 +988,7 @@ render = function( struct ) {
 
 					parsed.inner = children;
 
-
 				}
-
-				
 
 			} else if (parsed.inner === 'string') {
 				children = parsed.inner;
