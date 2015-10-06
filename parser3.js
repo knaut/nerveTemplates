@@ -835,11 +835,20 @@ testArr8 = [
 	}
 ]
 
+testArr9 = {
+	'#a.foo[data-val=1][data-val="a"]': {
+		'#b.bar[data-val=2]': {
+			'#c.baz.banksy[data-val=3]': 'hello World!'
+		}
+	}
+}
+
 // one loop to rule both kinds of structures, arrays and objects
 render = function( struct ) {
 
 	// determine type at root level
 	if (struct.hasOwnProperty('length')) {
+		console.log(struct, typeof struct)
 		if (typeof struct === 'string') {
 			var type = 'string';
 		} else {
@@ -888,16 +897,24 @@ render = function( struct ) {
 	}
 
 	if (type === 'string') {
-		var obj = {};
-		var key = struct.split(/:/)[0];
-		var val = struct.split(/:/)[1];
+		if (type.indexOf(':') > -1) {
+			console.log(normalized)
+			normalized.push( struct );
+		} else {
+			var obj = {};
+			var key = struct.split(/:/)[0];
+			var val = struct.split(/:/)[1];
 
-		obj[key] = val;
+			obj[key] = val;
 
-		normalized.push( obj );
+			normalized.push( obj );
+		}
+		
 	}
 
 	var newStruct = [];
+
+	console.log(type, typeof normalized, normalized);
 
 	// we loop through all structs at the root level
 	for (var i = 0; normalized.length > i; i++) {
@@ -951,7 +968,7 @@ render = function( struct ) {
 			}
 
 			// grab the inner content
-			// console.log(inner)
+			console.log(inner)
 			if (inner === undefined) {
 				inner = null;
 			}
@@ -982,11 +999,13 @@ render = function( struct ) {
 					// console.log(parsed.inner.length)
 					console.log('its an object!', parsed.inner)
 
-					for (var child in parsed.inner) {
-						children.push( render( child ) );	
-					}
+					
+					// for (var child in parsed.inner) {
+					// 	console.log(child, render(child))
+						
+					// }
 
-					parsed.inner = children;
+					parsed.inner = render( parsed.inner );;
 
 				}
 
