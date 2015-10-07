@@ -8,17 +8,19 @@ peg = (function() {
 	 */
 
 	function peg$subclass(child, parent) {
-		function ctor() { this.constructor = child; }
+		function ctor() {
+			this.constructor = child;
+		}
 		ctor.prototype = parent.prototype;
 		child.prototype = new ctor();
 	}
 
 	function peg$SyntaxError(message, expected, found, location) {
-		this.message  = message;
+		this.message = message;
 		this.expected = expected;
-		this.found    = found;
+		this.found = found;
 		this.location = location;
-		this.name     = "SyntaxError";
+		this.name = "SyntaxError";
 
 		if (typeof Error.captureStackTrace === "function") {
 			Error.captureStackTrace(this, peg$SyntaxError);
@@ -29,58 +31,136 @@ peg = (function() {
 
 	function peg$parse(input) {
 		var options = arguments.length > 1 ? arguments[1] : {},
-				parser  = this,
+			parser = this,
 
-				peg$FAILED = {},
+			peg$FAILED = {},
 
-				peg$startRuleFunctions = { start: peg$parsestart },
-				peg$startRuleFunction  = peg$parsestart,
+			peg$startRuleFunctions = {
+				start: peg$parsestart
+			},
+			peg$startRuleFunction = peg$parsestart,
 
-				peg$c0 = "*",
-				peg$c1 = { type: "literal", value: "*", description: "\"*\"" },
-				peg$c2 = function(i, j) {return i + j.join('');},
-				peg$c3 = "#",
-				peg$c4 = { type: "literal", value: "#", description: "\"#\"" },
-				peg$c5 = function(h) {return h.join('');},
-				peg$c6 = ".",
-				peg$c7 = { type: "literal", value: ".", description: "\".\"" },
-				peg$c8 = function(c) {return c.join('');},
-				peg$c9 = "[",
-				peg$c10 = { type: "literal", value: "[", description: "\"[\"" },
-				peg$c11 = /^[^\]]/,
-				peg$c12 = { type: "class", value: "[^\\]]", description: "[^\\]]" },
-				peg$c13 = function(b) {return b.join('');},
-				peg$c14 = "]",
-				peg$c15 = { type: "literal", value: "]", description: "\"]\"" },
-				peg$c16 = function(a) {return a.join('');},
-				peg$c17 = ":",
-				peg$c18 = { type: "literal", value: ":", description: "\":\"" },
-				peg$c19 = function(p) {return p.join('');},
-				peg$c20 = /^[a-z]/i,
-				peg$c21 = { type: "class", value: "[a-z]i", description: "[a-z]i" },
-				peg$c22 = /^[a-z0-9\-]/,
-				peg$c23 = { type: "class", value: "[a-z0-9-]", description: "[a-z0-9-]" },
-				peg$c24 = "(",
-				peg$c25 = { type: "literal", value: "(", description: "\"(\"" },
-				peg$c26 = ")",
-				peg$c27 = { type: "literal", value: ")", description: "\")\"" },
-				peg$c28 = function(f) {return f.join('');},
-				peg$c29 = /^[^)]/,
-				peg$c30 = { type: "class", value: "[^\\)]", description: "[^\\)]" },
-				peg$c31 = /^[A-Z]/i,
-				peg$c32 = { type: "class", value: "[A-Z]i", description: "[A-Z]i" },
-				peg$c33 = /^[ \t\n\r]/,
-				peg$c34 = { type: "class", value: "[ \\t\\n\\r]", description: "[ \\t\\n\\r]" },
-				peg$c35 = function() {return '';},
+			peg$c0 = "*",
+			peg$c1 = {
+				type: "literal",
+				value: "*",
+				description: "\"*\""
+			},
+			peg$c2 = function(i, j) {
+				return i + j.join('');
+			},
+			peg$c3 = "#",
+			peg$c4 = {
+				type: "literal",
+				value: "#",
+				description: "\"#\""
+			},
+			peg$c5 = function(h) {
+				return h.join('');
+			},
+			peg$c6 = ".",
+			peg$c7 = {
+				type: "literal",
+				value: ".",
+				description: "\".\""
+			},
+			peg$c8 = function(c) {
+				return c.join('');
+			},
+			peg$c9 = "[",
+			peg$c10 = {
+				type: "literal",
+				value: "[",
+				description: "\"[\""
+			},
+			peg$c11 = /^[^\]]/,
+			peg$c12 = {
+				type: "class",
+				value: "[^\\]]",
+				description: "[^\\]]"
+			},
+			peg$c13 = function(b) {
+				return b.join('');
+			},
+			peg$c14 = "]",
+			peg$c15 = {
+				type: "literal",
+				value: "]",
+				description: "\"]\""
+			},
+			peg$c16 = function(a) {
+				return a.join('');
+			},
+			peg$c17 = ":",
+			peg$c18 = {
+				type: "literal",
+				value: ":",
+				description: "\":\""
+			},
+			peg$c19 = function(p) {
+				return p.join('');
+			},
+			peg$c20 = /^[a-z]/i,
+			peg$c21 = {
+				type: "class",
+				value: "[a-z]i",
+				description: "[a-z]i"
+			},
+			peg$c22 = /^[a-z0-9\-]/,
+			peg$c23 = {
+				type: "class",
+				value: "[a-z0-9-]",
+				description: "[a-z0-9-]"
+			},
+			peg$c24 = "(",
+			peg$c25 = {
+				type: "literal",
+				value: "(",
+				description: "\"(\""
+			},
+			peg$c26 = ")",
+			peg$c27 = {
+				type: "literal",
+				value: ")",
+				description: "\")\""
+			},
+			peg$c28 = function(f) {
+				return f.join('');
+			},
+			peg$c29 = /^[^)]/,
+			peg$c30 = {
+				type: "class",
+				value: "[^\\)]",
+				description: "[^\\)]"
+			},
+			peg$c31 = /^[A-Z]/i,
+			peg$c32 = {
+				type: "class",
+				value: "[A-Z]i",
+				description: "[A-Z]i"
+			},
+			peg$c33 = /^[ \t\n\r]/,
+			peg$c34 = {
+				type: "class",
+				value: "[ \\t\\n\\r]",
+				description: "[ \\t\\n\\r]"
+			},
+			peg$c35 = function() {
+				return '';
+			},
 
-				peg$currPos          = 0,
-				peg$savedPos         = 0,
-				peg$posDetailsCache  = [{ line: 1, column: 1, seenCR: false }],
-				peg$maxFailPos       = 0,
-				peg$maxFailExpected  = [],
-				peg$silentFails      = 0,
+			peg$currPos = 0,
+			peg$savedPos = 0,
+			peg$posDetailsCache = [{
+				line: 1,
+				column: 1,
+				seenCR: false
+			}],
+			peg$maxFailPos = 0,
+			peg$maxFailExpected = [],
+			peg$silentFails = 0,
 
-				peg$result;
+			peg$result;
 
 		if ("startRule" in options) {
 			if (!(options.startRule in peg$startRuleFunctions)) {
@@ -100,8 +180,10 @@ peg = (function() {
 
 		function expected(description) {
 			throw peg$buildException(
-				null,
-				[{ type: "other", description: description }],
+				null, [{
+					type: "other",
+					description: description
+				}],
 				input.substring(peg$savedPos, peg$currPos),
 				peg$computeLocation(peg$savedPos, peg$currPos)
 			);
@@ -118,7 +200,7 @@ peg = (function() {
 
 		function peg$computePosDetails(pos) {
 			var details = peg$posDetailsCache[pos],
-					p, ch;
+				p, ch;
 
 			if (details) {
 				return details;
@@ -130,7 +212,7 @@ peg = (function() {
 
 				details = peg$posDetailsCache[p];
 				details = {
-					line:   details.line,
+					line: details.line,
 					column: details.column,
 					seenCR: details.seenCR
 				};
@@ -138,7 +220,9 @@ peg = (function() {
 				while (p < pos) {
 					ch = input.charAt(p);
 					if (ch === "\n") {
-						if (!details.seenCR) { details.line++; }
+						if (!details.seenCR) {
+							details.line++;
+						}
 						details.column = 1;
 						details.seenCR = false;
 					} else if (ch === "\r" || ch === "\u2028" || ch === "\u2029") {
@@ -160,24 +244,26 @@ peg = (function() {
 
 		function peg$computeLocation(startPos, endPos) {
 			var startPosDetails = peg$computePosDetails(startPos),
-					endPosDetails   = peg$computePosDetails(endPos);
+				endPosDetails = peg$computePosDetails(endPos);
 
 			return {
 				start: {
 					offset: startPos,
-					line:   startPosDetails.line,
+					line: startPosDetails.line,
 					column: startPosDetails.column
 				},
 				end: {
 					offset: endPos,
-					line:   endPosDetails.line,
+					line: endPosDetails.line,
 					column: endPosDetails.column
 				}
 			};
 		}
 
 		function peg$fail(expected) {
-			if (peg$currPos < peg$maxFailPos) { return; }
+			if (peg$currPos < peg$maxFailPos) {
+				return;
+			}
 
 			if (peg$currPos > peg$maxFailPos) {
 				peg$maxFailPos = peg$currPos;
@@ -212,34 +298,40 @@ peg = (function() {
 
 			function buildMessage(expected, found) {
 				function stringEscape(s) {
-					function hex(ch) { return ch.charCodeAt(0).toString(16).toUpperCase(); }
+					function hex(ch) {
+						return ch.charCodeAt(0).toString(16).toUpperCase();
+					}
 
 					return s
-						.replace(/\\/g,   '\\\\')
-						.replace(/"/g,    '\\"')
+						.replace(/\\/g, '\\\\')
+						.replace(/"/g, '\\"')
 						.replace(/\x08/g, '\\b')
-						.replace(/\t/g,   '\\t')
-						.replace(/\n/g,   '\\n')
-						.replace(/\f/g,   '\\f')
-						.replace(/\r/g,   '\\r')
-						.replace(/[\x00-\x07\x0B\x0E\x0F]/g, function(ch) { return '\\x0' + hex(ch); })
-						.replace(/[\x10-\x1F\x80-\xFF]/g,    function(ch) { return '\\x'  + hex(ch); })
-						.replace(/[\u0100-\u0FFF]/g,         function(ch) { return '\\u0' + hex(ch); })
-						.replace(/[\u1000-\uFFFF]/g,         function(ch) { return '\\u'  + hex(ch); });
+						.replace(/\t/g, '\\t')
+						.replace(/\n/g, '\\n')
+						.replace(/\f/g, '\\f')
+						.replace(/\r/g, '\\r')
+						.replace(/[\x00-\x07\x0B\x0E\x0F]/g, function(ch) {
+							return '\\x0' + hex(ch);
+						})
+						.replace(/[\x10-\x1F\x80-\xFF]/g, function(ch) {
+							return '\\x' + hex(ch);
+						})
+						.replace(/[\u0100-\u0FFF]/g, function(ch) {
+							return '\\u0' + hex(ch);
+						})
+						.replace(/[\u1000-\uFFFF]/g, function(ch) {
+							return '\\u' + hex(ch);
+						});
 				}
 
 				var expectedDescs = new Array(expected.length),
-						expectedDesc, foundDesc, i;
+					expectedDesc, foundDesc, i;
 
 				for (i = 0; i < expected.length; i++) {
 					expectedDescs[i] = expected[i].description;
 				}
 
-				expectedDesc = expected.length > 1
-					? expectedDescs.slice(0, -1).join(", ")
-							+ " or "
-							+ expectedDescs[expected.length - 1]
-					: expectedDescs[0];
+				expectedDesc = expected.length > 1 ? expectedDescs.slice(0, -1).join(", ") + " or " + expectedDescs[expected.length - 1] : expectedDescs[0];
 
 				foundDesc = found ? "\"" + stringEscape(found) + "\"" : "end of input";
 
@@ -317,7 +409,9 @@ peg = (function() {
 				peg$currPos++;
 			} else {
 				s0 = peg$FAILED;
-				if (peg$silentFails === 0) { peg$fail(peg$c1); }
+				if (peg$silentFails === 0) {
+					peg$fail(peg$c1);
+				}
 			}
 			if (s0 === peg$FAILED) {
 				s0 = peg$parseident();
@@ -364,7 +458,9 @@ peg = (function() {
 				peg$currPos++;
 			} else {
 				s2 = peg$FAILED;
-				if (peg$silentFails === 0) { peg$fail(peg$c4); }
+				if (peg$silentFails === 0) {
+					peg$fail(peg$c4);
+				}
 			}
 			if (s2 !== peg$FAILED) {
 				s3 = peg$parseident();
@@ -398,7 +494,9 @@ peg = (function() {
 				peg$currPos++;
 			} else {
 				s2 = peg$FAILED;
-				if (peg$silentFails === 0) { peg$fail(peg$c7); }
+				if (peg$silentFails === 0) {
+					peg$fail(peg$c7);
+				}
 			}
 			if (s2 !== peg$FAILED) {
 				s3 = peg$parseident();
@@ -432,7 +530,9 @@ peg = (function() {
 				peg$currPos++;
 			} else {
 				s2 = peg$FAILED;
-				if (peg$silentFails === 0) { peg$fail(peg$c10); }
+				if (peg$silentFails === 0) {
+					peg$fail(peg$c10);
+				}
 			}
 			if (s2 !== peg$FAILED) {
 				s3 = peg$currPos;
@@ -442,7 +542,9 @@ peg = (function() {
 					peg$currPos++;
 				} else {
 					s5 = peg$FAILED;
-					if (peg$silentFails === 0) { peg$fail(peg$c12); }
+					if (peg$silentFails === 0) {
+						peg$fail(peg$c12);
+					}
 				}
 				if (s5 !== peg$FAILED) {
 					while (s5 !== peg$FAILED) {
@@ -452,7 +554,9 @@ peg = (function() {
 							peg$currPos++;
 						} else {
 							s5 = peg$FAILED;
-							if (peg$silentFails === 0) { peg$fail(peg$c12); }
+							if (peg$silentFails === 0) {
+								peg$fail(peg$c12);
+							}
 						}
 					}
 				} else {
@@ -469,7 +573,9 @@ peg = (function() {
 						peg$currPos++;
 					} else {
 						s4 = peg$FAILED;
-						if (peg$silentFails === 0) { peg$fail(peg$c15); }
+						if (peg$silentFails === 0) {
+							peg$fail(peg$c15);
+						}
 					}
 					if (s4 !== peg$FAILED) {
 						s2 = [s2, s3, s4];
@@ -505,7 +611,9 @@ peg = (function() {
 				peg$currPos++;
 			} else {
 				s2 = peg$FAILED;
-				if (peg$silentFails === 0) { peg$fail(peg$c18); }
+				if (peg$silentFails === 0) {
+					peg$fail(peg$c18);
+				}
 			}
 			if (s2 !== peg$FAILED) {
 				s3 = peg$parsefunction();
@@ -537,7 +645,9 @@ peg = (function() {
 				peg$currPos++;
 			} else {
 				s0 = peg$FAILED;
-				if (peg$silentFails === 0) { peg$fail(peg$c21); }
+				if (peg$silentFails === 0) {
+					peg$fail(peg$c21);
+				}
 			}
 			if (s0 === peg$FAILED) {
 				s0 = peg$parsenonascii();
@@ -554,7 +664,9 @@ peg = (function() {
 				peg$currPos++;
 			} else {
 				s0 = peg$FAILED;
-				if (peg$silentFails === 0) { peg$fail(peg$c23); }
+				if (peg$silentFails === 0) {
+					peg$fail(peg$c23);
+				}
 			}
 			if (s0 === peg$FAILED) {
 				s0 = peg$parsenonascii();
@@ -575,7 +687,9 @@ peg = (function() {
 					peg$currPos++;
 				} else {
 					s3 = peg$FAILED;
-					if (peg$silentFails === 0) { peg$fail(peg$c25); }
+					if (peg$silentFails === 0) {
+						peg$fail(peg$c25);
+					}
 				}
 				if (s3 !== peg$FAILED) {
 					s4 = peg$parsebody();
@@ -585,7 +699,9 @@ peg = (function() {
 							peg$currPos++;
 						} else {
 							s5 = peg$FAILED;
-							if (peg$silentFails === 0) { peg$fail(peg$c27); }
+							if (peg$silentFails === 0) {
+								peg$fail(peg$c27);
+							}
 						}
 						if (s5 !== peg$FAILED) {
 							s2 = [s2, s3, s4, s5];
@@ -625,7 +741,9 @@ peg = (function() {
 				peg$currPos++;
 			} else {
 				s2 = peg$FAILED;
-				if (peg$silentFails === 0) { peg$fail(peg$c30); }
+				if (peg$silentFails === 0) {
+					peg$fail(peg$c30);
+				}
 			}
 			if (s2 !== peg$FAILED) {
 				while (s2 !== peg$FAILED) {
@@ -635,7 +753,9 @@ peg = (function() {
 						peg$currPos++;
 					} else {
 						s2 = peg$FAILED;
-						if (peg$silentFails === 0) { peg$fail(peg$c30); }
+						if (peg$silentFails === 0) {
+							peg$fail(peg$c30);
+						}
 					}
 				}
 			} else {
@@ -658,7 +778,9 @@ peg = (function() {
 				peg$currPos++;
 			} else {
 				s0 = peg$FAILED;
-				if (peg$silentFails === 0) { peg$fail(peg$c32); }
+				if (peg$silentFails === 0) {
+					peg$fail(peg$c32);
+				}
 			}
 
 			return s0;
@@ -674,7 +796,9 @@ peg = (function() {
 				peg$currPos++;
 			} else {
 				s2 = peg$FAILED;
-				if (peg$silentFails === 0) { peg$fail(peg$c34); }
+				if (peg$silentFails === 0) {
+					peg$fail(peg$c34);
+				}
 			}
 			if (s2 !== peg$FAILED) {
 				while (s2 !== peg$FAILED) {
@@ -684,7 +808,9 @@ peg = (function() {
 						peg$currPos++;
 					} else {
 						s2 = peg$FAILED;
-						if (peg$silentFails === 0) { peg$fail(peg$c34); }
+						if (peg$silentFails === 0) {
+							peg$fail(peg$c34);
+						}
 					}
 				}
 			} else {
@@ -705,23 +831,24 @@ peg = (function() {
 			return peg$result;
 		} else {
 			if (peg$result !== peg$FAILED && peg$currPos < input.length) {
-				peg$fail({ type: "end", description: "end of input" });
+				peg$fail({
+					type: "end",
+					description: "end of input"
+				});
 			}
 
 			throw peg$buildException(
 				null,
 				peg$maxFailExpected,
 				peg$maxFailPos < input.length ? input.charAt(peg$maxFailPos) : null,
-				peg$maxFailPos < input.length
-					? peg$computeLocation(peg$maxFailPos, peg$maxFailPos + 1)
-					: peg$computeLocation(peg$maxFailPos, peg$maxFailPos)
+				peg$maxFailPos < input.length ? peg$computeLocation(peg$maxFailPos, peg$maxFailPos + 1) : peg$computeLocation(peg$maxFailPos, peg$maxFailPos)
 			);
 		}
 	}
 
 	return {
 		SyntaxError: peg$SyntaxError,
-		parse:       peg$parse
+		parse: peg$parse
 	};
 })();
 
@@ -750,7 +877,7 @@ template = {
 		'div': 'blah',
 		'header': {
 			'div#test': 'test',
-			'div#blah': { 
+			'div#blah': {
 				'span#meh': 'blah blah'
 			}
 		},
@@ -772,47 +899,58 @@ template = {
 // a workaround could be to wrap the container el that has multiple els of the same selector in an array, and turn the enclosing key/vals into objects
 
 template2 = {
-	'#root': [
-		{ 'div': 'blah' },
-		{ 'div': 'blah' },
-		{ 'div': 'blah' },
-		{ 'span': 'this is just a test template' },
-		{ 'div#amazing.my-other-class': 'a series of nested elements…' },
-		{ 'nav': {
-			'span': 'this is a nested child'
+	'#root': [{
+			'div': 'blah'
+		}, {
+			'div': 'blah'
+		}, {
+			'div': 'blah'
+		}, {
+			'span': 'this is just a test template'
+		}, {
+			'div#amazing.my-other-class': 'a series of nested elements…'
+		}, {
+			'nav': {
+				'span': 'this is a nested child'
 			}
+		}, {
+			'div': 'blah'
 		},
-		{ 'div': 'blah' },
-		[
-			{ 'header': {
+		// nested arrays in arrays like this cause issues
+		[{
+			'header': {
 				'div#test': 'test',
-				'div#blah': { 
+				'div#blah': {
 					'span#meh': 'blah blah'
 				}
-			}},
-			{'footer#test': {
+			}
+		}, {
+			'footer#test': {
 				'ul': {
 					'li#test': 'span'
 				}
-			}}
-		]
+			}
+		}]
 	]
 };
 
 
 testArr1 = {
-	'#a.foo[data-val="1"][data-val="a"]': [
-		{ 'div': 'test text' },
-		{ 'div': 'other text' }
-	],
-	'#b.bar[data-val=2]': [
-		{ 'div': 'test text' },
-		{ 'div': 'other text' }
-	],
-	'#c.baz.banksy[data-val=3]': [
-		{ 'div': 'test text' },
-		{ 'div': 'other text' }
-	]
+	'#a.foo[data-val="1"][data-val="a"]': [{
+		'div': 'test text'
+	}, {
+		'div': 'other text'
+	}],
+	'#b.bar[data-val=2]': [{
+		'div': 'test text'
+	}, {
+		'div': 'other text'
+	}],
+	'#c.baz.banksy[data-val=3]': [{
+		'div': 'test text'
+	}, {
+		'div': 'other text'
+	}]
 }
 
 testArr2 = {
@@ -845,26 +983,22 @@ testArr3 = {
 	]
 }
 
-testArr4 = [
-	{ 
-		'#a.foo[data-val=1][data-val="a"]': [
-			'div:test text',
-			'div:other text'
-		]
-	},
-	{ 
-		'#b.bar[data-val=2]': [
-			'div:test text',
-			'div:other text'
-		]
-	},
-	{ 
-		'#c.baz.banksy[data-val=3]': [
-			'div:test text',
-			'div:other text'
-		]
-	}
-]
+testArr4 = [{
+	'#a.foo[data-val=1][data-val="a"]': [
+		'div:test text',
+		'div:other text'
+	]
+}, {
+	'#b.bar[data-val=2]': [
+		'div:test text',
+		'div:other text'
+	]
+}, {
+	'#c.baz.banksy[data-val=3]': [
+		'div:test text',
+		'div:other text'
+	]
+}]
 
 testArr5 = [
 	'a#a.foo[data-val=1][data-val="a"]:test text'
@@ -874,14 +1008,11 @@ testArr6 = 'span#a.foo[data-val=1][data-val="a"]:blah blah'
 
 testArr7 = 'div'
 
-testArr8 = [
-	{ 
-		'div': 'test'
-	},
-	{ 
-		'div': 'test'
-	}
-]
+testArr8 = [{
+	'div': 'test'
+}, {
+	'div': 'test'
+}]
 
 testArr9 = {
 	'#a.foo[data-val=1][data-val="a"]': {
@@ -910,40 +1041,101 @@ testArr11 = {
 		},
 
 		'#d.bar[data-val=4]': {
-			'#e.baz.banksy[data-val=5]': [
-				{ 'div': 'blah' },
-				{ 'div': 'blah' },
-				{ 'div': 'blah' },
-				{ 'span': 'this is just a test template' },
-				{ 'div#amazing.my-other-class': 'a series of nested elements…' },
-				{ 'nav': {
-					'span': 'this is a nested child'
+			'#e.baz.banksy[data-val=5]': [{
+					'div': 'blah'
+				}, {
+					'div': 'blah'
+				}, {
+					'div': 'blah'
+				}, {
+					'span': 'this is just a test template'
+				}, {
+					'div#amazing.my-other-class': 'a series of nested elements…'
+				}, {
+					'nav': {
+						'span': 'this is a nested child'
 					}
+				}, {
+					'div': 'blah'
 				},
-				{ 'div': 'blah' },
-				[
-					{ 'header': {
+				[{
+					'header': {
 						'div#test': 'test',
-						'div#blah': { 
+						'div#blah': {
 							'span#meh': 'blah blah'
 						}
-					}},
-					{'footer#test': {
+					}
+				}, {
+					'footer#test': {
 						'ul': {
 							'li#test': 'span'
 						}
-					}}
-				]
+					}
+				}]
 			]
 		}
 	}
+}
+
+parse = function(obj, key) {
+	var tag = key; // css-like selector
+	var inner = obj[key]; // innerHtml content
+	// we rely on a generated peg parser for css selector parsing for now
+	var parsed = peg.parse(key);
+
+	// prepare to refine parsed classes and custom attrs
+	if (parsed[0] === null) {
+		parsed[0] = 'div';
+	}
+	var attrsClasses = parsed[2];
+	var attrReg = /[\d\w\s-]+/gi;
+	var classes = [];
+	var attrs = [];
+
+	for (var c = 0; attrsClasses.length > c; c++) {
+		if (attrsClasses[c].indexOf('.') > -1) {
+			// if the string has a ., we will assume it's a css class
+			var className = attrsClasses[c].split('.')[1];
+			classes.push(className);
+		}
+
+		if (attrsClasses[c].indexOf('[') > -1) {
+			// assume attribute based on usual selector
+			var attr = attrsClasses[c];
+			var attrKey = attr.match(attrReg)[0];
+			var attrVal = attr.match(attrReg)[1];
+
+			// store the attribute as a map for string concat later
+			var attrMap = {};
+			attrMap[attrKey] = attrVal;
+			attrs.push(attrMap);
+		}
+	}
+
+
+	// preferring null over undefined
+	if (inner === undefined) {
+		// console.log(obj, key)
+		inner = null;
+	}
+
+	// re-set the parsed var with a map of everything parsed
+	parsed = {
+		tagName: parsed[0],
+		id: parsed[1],
+		classes: classes,
+		attrs: attrs,
+		inner: inner
+	}
+
+	return parsed;
 }
 
 // recursively take a nested object where the keys are selectors
 // and the vals are objects, arrays, or text nodes (strings)
 // and normalize it into a consistently nested pattern of
 // arrayed objects that map easily onto DOM nodes
-normalize = function( struct ) {
+normalize = function(struct) {
 
 	// determine type at root level
 	if (struct.hasOwnProperty('length')) {
@@ -959,10 +1151,10 @@ normalize = function( struct ) {
 
 	// normalize objects as arrays
 	var normalized = [];
-	
+
 	if (type === 'object') {
-		var keys = Object.keys( struct );
-		
+		var keys = Object.keys(struct);
+
 		for (var k = 0; keys.length > k; k++) {
 			var obj = {};
 			var key = keys[k];
@@ -970,7 +1162,7 @@ normalize = function( struct ) {
 
 			obj[key] = val;
 
-			normalized.push( obj );
+			normalized.push(obj);
 		}
 	}
 
@@ -986,20 +1178,20 @@ normalize = function( struct ) {
 
 				obj[key] = val;
 
-				normalized.push( obj );
+				normalized.push(obj);
 			}
 
 			if (typeof ai === 'object') {
-				normalized.push( ai );
+				normalized.push(ai);
 			}
 		}
 	}
 
 	if (type === 'string') {
 		// this could cause issues if there's a semi-colon in the inner text
-		if (type.indexOf(':') > -1) {
+		if (type.indexOf(':') === -1) {
 			// console.log(normalized)
-			normalized.push( struct );
+			normalized.push(struct);
 		} else {
 			var obj = {};
 			var key = struct.split(/:/)[0];
@@ -1007,117 +1199,37 @@ normalize = function( struct ) {
 
 			obj[key] = val;
 
-			normalized.push( obj );
+			normalized.push(obj);
 		}
-		
+
 	}
 
 	// scoping an array to push parsed objects to later
 	var newStruct = [];
 
-	// we loop through all structs at the root level
-	for (var i = 0; normalized.length > i; i++) {
+	if (type !== 'string') {
 
-		var obj = normalized[i];
+		// we loop through all structs at the root level
+		for (var i = 0; normalized.length > i; i++) {
 
-		// begin parsing process
-		var children = [];
+			var obj = normalized[i];
 
-		for (var key in obj) {
-			
-			var tag = key;			// css-like selector
-			var inner = obj[key];	// innerHtml content
+			// begin parsing process
+			for (var key in obj) {
 
-			// we rely on a generated peg parser for css selector parsing for now
-			var parsed = peg.parse( key );	
-			
-			// prepare to refine parsed classes and custom attrs
-			if (parsed[0] === null) {
-				parsed[0] = 'div';
-			}
-			var attrsClasses = parsed[2];
-			var attrReg = /[\d\w\s-]+/gi;
-			var classes = [];
-			var attrs = [];
+				// pass the normalized object to be parsed,
+				// continue wiht the object we recieve
+				var parsed = parse(obj, key)
 
-			for (var c = 0; attrsClasses.length > c; c++) {
-				if (attrsClasses[c].indexOf('.') > -1) {
-					// if the string has a ., we will assume it's a css class
-					var className = attrsClasses[c].split('.')[1];
-					classes.push( className );
-				}
-
-				if (attrsClasses[c].indexOf('[') > -1) {
-					// assume attribute based on usual selector
-					var attr = attrsClasses[c];
-					var attrKey = attr.match(attrReg)[0];
-					var attrVal = attr.match(attrReg)[1];
-
-					// store the attribute as a map for string concat later
-					var attrMap = {};
-					attrMap[attrKey] = attrVal;
-					attrs.push(attrMap);
+				// unless its a string, we recurse over the nested
+				// inner objects
+				if (typeof parsed.inner !== 'string') {
+					parsed.inner = normalize(parsed.inner);
 				}
 			}
 
-			// preferring null over undefined
-			if (inner === undefined) {
-				inner = null;
-			}
-
-			// re-set the parsed var with a map of everything parsed
-			parsed = {
-				tagName: parsed[0],
-				id: parsed[1],
-				classes: classes,
-				attrs: attrs,
-				inner: inner
-			}
-			
-			// recursively build a series arrayed objects with nested children
-			if (typeof parsed.inner === 'object' && parsed.inner !== null) {
-				
-				if (parsed.inner.length !== undefined) {
-
-					//  support for arbitrarily nested arrays of objects
-					var parsedInnerArr = [];	// scope a new array for later
-
-					for (var p = 0; parsed.inner.length > p; p++) {
-						
-						if (typeof parsed.inner[p] === 'object' && parsed.inner[p].hasOwnProperty('length') && parsed.inner[p].length > 0) {
-
-							for (var t = 0; parsed.inner[p].length > t; t++) {
-								parsedInnerArr.push( normalize( parsed.inner[p][t] ) );
-							}
-
-						} else {
-							parsedInnerArr.push( normalize( parsed.inner[p] ) );
-						}
-						
-					}
-					
-					parsed.inner = parsedInnerArr;
-
-				} else {
-					
-					// for (var child in parsed.inner) {
-					// 	children.push( normalize(child) )
-					// }
-
-					parsed.inner = normalize( parsed.inner );
-
-				}
-
-
-
-			} else if (parsed.inner === 'string') {
-				children = parsed.inner;
-			}
-
-			newStruct = parsed;
-
+			newStruct.push(parsed)
 		}
-	
 	}
 
 	// the final returned structure should be a normalized pattern,
@@ -1129,7 +1241,7 @@ normalize = function( struct ) {
 
 // take the normalized, nested array of objects and output a string that can
 // be used as a template
-stringify = function( normalized ) {
+stringify = function(normalized) {
 
 	var string = '';
 	var innerChildren = [];
@@ -1166,14 +1278,14 @@ stringify = function( normalized ) {
 		// end the root tag
 		string += '>';
 
-		if ( obj.hasOwnProperty('inner') && obj.inner.length ) {
+		if (obj.hasOwnProperty('inner') && obj.inner.length) {
 			console.log(obj.inner)
 
-			innerChildren.push( stringify( obj.inner ) );
+			innerChildren.push(stringify(obj.inner));
 
 		}
-		
-		
+
+
 
 		// console.log(string)
 	}
@@ -1183,14 +1295,3 @@ stringify = function( normalized ) {
 	return string;
 
 }
-
-
-
-
-
-
-
-
-
-
-
