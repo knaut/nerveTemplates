@@ -855,21 +855,11 @@ peg = (function() {
 
 
 // simple template
-
 template = {
 	'div.container': {
 		'span.message': '{{message}}'
 	}
 }
-
-// simple data object
-
-data = {
-	message: 'Hello World'
-}
-
-interpolate = /\{\{(.+?)\}\}/g;
-
 
 // normalize an object into an array
 template = {
@@ -897,7 +887,6 @@ template = {
 // javascript doesn't do object literals with the same key name
 // this might be rare in the day-to-day, but still a downer
 // a workaround could be to wrap the container el that has multiple els of the same selector in an array, and turn the enclosing key/vals into objects
-
 template2 = {
 	'#root': [{
 			'div': 'blah'
@@ -917,7 +906,7 @@ template2 = {
 			'div': 'blah'
 		},
 		// nested arrays in arrays like this cause issues
-		[{
+		{
 			'header': {
 				'div#test': 'test',
 				'div#blah': {
@@ -930,7 +919,7 @@ template2 = {
 					'li#test': 'span'
 				}
 			}
-		}]
+		}
 	]
 };
 
@@ -1000,13 +989,15 @@ testArr4 = [{
 	]
 }]
 
-testArr5 = [
-	'a#a.foo[data-val=1][data-val="a"]:test text'
-]
+// testArr5 = [
+// 	'a#a.foo[data-val=1][data-val="a"]:test text'
+// ]
 
-testArr6 = 'span#a.foo[data-val=1][data-val="a"]:blah blah'
+// not supported
+// testArr6 = 'span#a.foo[data-val=1][data-val="a"]:blah blah'
 
-testArr7 = 'div'
+// not supported
+// testArr7 = 'div'
 
 testArr8 = [{
 	'div': 'test'
@@ -1057,21 +1048,7 @@ testArr11 = {
 					}
 				}, {
 					'div': 'blah'
-				},
-				[{
-					'header': {
-						'div#test': 'test',
-						'div#blah': {
-							'span#meh': 'blah blah'
-						}
-					}
-				}, {
-					'footer#test': {
-						'ul': {
-							'li#test': 'span'
-						}
-					}
-				}]
+				}
 			]
 		}
 	}
@@ -1119,10 +1096,16 @@ parse = function(obj, key) {
 		inner = null;
 	}
 
+	// split id off the #
+	var id = parsed[1];
+	if (id) {
+		id = id.split('#')[1];
+	}
+
 	// re-set the parsed var with a map of everything parsed
 	parsed = {
 		tagName: parsed[0],
-		id: parsed[1],
+		id: id,
 		classes: classes,
 		attrs: attrs,
 		inner: inner
@@ -1171,7 +1154,6 @@ normalize = function(struct) {
 			var ai = struct[a];
 
 			if (typeof ai === 'string') {
-
 				var obj = {};
 				var key = ai.split(/:/)[0];
 				var val = ai.split(/:/)[1];
@@ -1248,6 +1230,9 @@ stringify = function(normalized) {
 
 	// iterate through the parsed object and
 	// modify the string
+	// console.log( typeof normalized, normalized )
+	if (typeof normalized === 'string') return;
+	
 	for (var n = 0; normalized.length > n; n++) {
 
 		var obj = normalized[n];
@@ -1278,19 +1263,17 @@ stringify = function(normalized) {
 		// end the root tag
 		string += '>';
 
-		if (obj.hasOwnProperty('inner') && obj.inner.length) {
-			console.log(obj.inner)
-
-			innerChildren.push(stringify(obj.inner));
-
+		if (obj.hasOwnProperty('inner') && obj.inner.length && typeof obj.inner !== 'string') {
+			// console.log(obj)
+			string += stringify(obj.inner);
+		} else if (typeof obj.inner === 'string') {
+			string += obj.inner;
 		}
 
-
+		string += '</' + obj.tagName + '>';
 
 		// console.log(string)
 	}
-
-	// console.log(innerChildren)
 
 	return string;
 
