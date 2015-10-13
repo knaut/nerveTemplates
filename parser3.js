@@ -1057,6 +1057,208 @@ testArr11 = {
 	}
 }
 
+// testing function templates
+tf1 = {
+	'div#tf1': {
+		'span': function() {
+			if (data.message) {
+				return {
+					div: '{{message}}'
+				}
+			} else {
+				return {
+					span: 'im not sure what im doing'
+				}
+			}
+		}
+	}
+}
+
+tf1 = {
+	'div#tf1': {
+		'span': function() {
+			if (data.message) {
+				{{message}}
+			} else {
+				'im not sure what im doing'
+			}
+		}
+	}
+}
+
+tf2 = {
+	'div#tf2': function() {
+		return {
+			span: 'test text'
+		}
+	}
+}
+
+tf3 = {
+	'div#tf3': function( data ) {
+		if (data) { 
+			return {
+				span: 'this is {{data}}'
+			}
+		} else {
+			return {
+				span: 'not sure'
+			}
+		}
+	}
+}
+
+tf4 = {
+	'#tf4': function( ) {
+		if (test) {
+
+		}
+	}
+}
+
+// in context, function args wouldn't mean much here, because their bodies
+// would be used by underscore during template rendering. these functions never get called,
+// they are just inlaid into the template
+tf4 = {
+	'div#tf3': function() {
+		if (message) { 
+			return {
+				span: 'this is {{message}}'
+			}
+		} else {
+			return {
+				span: 'not sure'
+			}
+		}
+	}
+}
+
+// you could re-render the function
+testReturn = '<div>{{ (function( data ) { return \'<span>:{{data}}:</span>\'})( data ) }}</div>'
+
+// but thats a stretch from this
+testReturn2 = '<div><< if (message) { >><span></span><< } else { >>bob<< } >></div>'
+
+// working based on test return 2
+// a = template(testReturn2)({message: 'test'})
+// yields "<div><< if (message) { >><span></span><< } else { >>bob<< } >></div>"
+
+// need a better syntax than tildes
+// annoying, but we split strings based on familiar tokens, which often happen to be ones we use later
+// would be nice to configure template (and thus parsing) settings based on a single config -- problem for later
+tr2 = {
+	'div.blah': function() {
+		if (message) {
+			return {
+				span: '~~message~~'
+			}
+		} else {
+			return {
+				span: 'bob'
+			}
+		}
+	}
+}
+
+// playing with custom syntaxes
+// these are the most visually boring, but also the simplest and easiest to write
+c1 = {
+	'#tf3': {
+		'if message': {
+			span: 'this is {{message}}'
+		},
+		'else': {
+			'#bob': 'bob'
+		}
+	}
+}
+
+c2 = {
+	'#tf3': {
+		'for item in myArray': {
+			span: 'this is {{message}}'
+		}
+	}
+}
+
+c3 = {
+	'#c3': {
+		'for item in myArray': {
+			'if item !== undefined': {
+				span: 'this is my {{item}}'
+			}
+		}
+	}
+}
+
+// () keep it simple *?
+
+// d1 = {
+// 	'#d1': {
+// 		'for': function(item in array) {
+// 			'if (item !== undefined)': {
+// 				span: 'this is my {{item}}'
+// 			}
+// 		}
+// 	}
+// }
+
+// just straight inline javascript
+d2 = {
+	'#d2': {
+		'for (var item in array)': {
+			'if (item !== undefined)': {
+				span: 'this is my {{item}}'
+			}
+		}
+	}
+}
+// or really use them like helpers/functions
+d3 = {
+	'#d3': {
+		forEach: function(index, array) {
+			if (index !== undefined) {
+				return {
+					span: 'this is some {{item}}'
+				}
+			}
+		},
+		ifElse: function() {}
+	}
+}
+
+d4 = {
+	'#d4': {
+		forEach: function(index, array) {
+			if (index !== undefined) {
+				return {
+					span: 'this is some {{item}}'
+				}
+			}
+		},
+		ifElse: function( someItem ) {
+			if (someItem !== undefined) {
+				return {
+					span: 'what is this {{someItem}}'
+				}
+			}
+		}
+	}
+}
+
+// or try to hack the system with the usually suspected strings
+// d5 = {
+// 	'#d5': {
+// 		'<< for (var prop in item) { >>': {
+// 			span: '{{item}}'
+// 		}
+// 	}
+// }
+
+
+
+
+
 parse = function(obj, key) {
 	var tag = key; // css-like selector
 	var inner = obj[key]; // innerHtml content
@@ -1129,11 +1331,17 @@ normalize = function(struct) {
 		if (typeof struct === 'string') {
 			var type = 'string';
 		} else {
-			var type = 'array';
+			if (typeof struct.push === 'function') {
+				var type = 'array';
+			} else {
+				var type = 'function';	
+			}
 		}
 	} else {
 		var type = 'object';
 	}
+
+	// console.log(typeof struct, struct);
 
 	// normalize objects as arrays
 	var normalized = [];
@@ -1186,6 +1394,22 @@ normalize = function(struct) {
 
 			normalized.push(obj);
 		}
+	}
+
+	if (type === 'function') {
+		var funcHead = /^function\s*[(][)]\s*[{]\s*/;	// eg 'function() { …'
+		var funcTail = /\s*[}]{1}\s*$/;		// eg last } bracket of the function
+		var funcReturns = /return\s*/;
+
+		console.log(type, struct);
+		var src = struct.toString();
+
+		// var body = src.split(/function () {/)[1];
+		// console.log(src, body)
+		console.log( parseFunction( src ) );
+		// var obj = {
+		// 	'function': src
+		// }
 
 	}
 
@@ -1203,13 +1427,17 @@ normalize = function(struct) {
 			for (var key in obj) {
 
 				// pass the normalized object to be parsed,
-				// continue wiht the object we recieve
+				// continue with the object we recieve
+				console.log(key)
 				var parsed = parse(obj, key)
 
 				// unless its a string, we recurse over the nested
 				// inner objects
+
 				if (typeof parsed.inner !== 'string') {
-					parsed.inner = normalize(parsed.inner);
+
+					parsed.inner = normalize(parsed.inner);	
+					
 				}
 			}
 
@@ -1286,8 +1514,10 @@ stringify = function(normalized) {
 // By default, Underscore uses ERB-style template delimiters, change the
 // following template settings to use alternative delimiters.
 
+_ = {}
+
 templateSettings = {
-	interpolate: /\{\{(.+?)\}\}/g,
+	interpolate: /\~\~(.+?)\~\~/g,
 	escape: /\-\-(.+?)\-\-/g,
 	evaluate: /\<\<(.+?)\>\>/g
 }
@@ -1312,13 +1542,98 @@ var escapeChar = function(match) {
 	return '\\' + escapes[match];
 };
 
+
+/** Function count the occurrences of substring in a string;
+ * @param {String} string   Required. The string;
+ * @param {String} subString    Required. The string to search for;
+ * @param {Boolean} allowOverlapping    Optional. Default: false;
+ * @author Vitim.us http://stackoverflow.com/questions/4009756/how-to-count-string-occurrence-in-string/7924240#7924240
+ */
+function occurrences(string, subString, allowOverlapping){
+
+    string+=""; subString+="";
+    if(subString.length<=0) return string.length+1;
+
+    var n=0, pos=0;
+    var step=allowOverlapping?1:subString.length;
+
+    while(true){
+        pos=string.indexOf(subString,pos);
+        if(pos>=0){ ++n; pos+=step; } else break;
+    }
+    return n;
+}
+
+parseFunction = function( func ) {
+	rgfuncHead = /^function\s*[(][)]\s*[{]\s*/;	// eg 'function() { …'
+	rgfuncTail = /\s*[}]{1}\s*$/;		// eg last } bracket of the function
+	rgfuncReturns = /return\s*/;
+
+	var src = func.toString();
+	src = src.split( src.match(rgfuncHead) )[1];
+	src = src.split( src.match(rgfuncTail) )[0];
+
+	var splitSrc = src.split('return');
+
+	var srcHead = splitSrc[0];
+	var srcBody = splitSrc;
+	srcBody.shift();
+
+	// loop through the function body and parse the return blocks
+	// we skip the first item, which is the src head
+
+	var parsedReturnBlocks = [];
+	for (var i = 0; srcBody.length > i; i++) {
+		var trimmedSrcBody = srcBody[i].replace(/\s/g, "");
+		parsedReturnBlocks.push( parseReturnBlock( trimmedSrcBody ) );
+	}
+
+	console.log(parsedReturnBlocks);
+
+	return src;
+}
+
+parseReturnBlock = function( string ) {
+	var enterBracesInt = 0;
+	var exitBracesInt = 0;
+	var sliceLength = 0;
+	
+	// cut out the object by finding when its number of opening/closing braces match
+	for (var i = 0; string.length > i; i++) {
+		if (string[i] === '{') {
+			enterBracesInt++;
+		}
+		if (string[i] === '}') {
+			exitBracesInt++;
+		}
+		if (enterBracesInt === exitBracesInt) {
+			sliceLength = i + 1;	// need an extra increment to catch the ending brace
+			break;
+		}
+	}
+	
+	var slicedString = string.slice(0, sliceLength);
+	slicedString = slicedString.replace('{', '');
+	slicedString = slicedString.replace('}', '');
+
+	var props = slicedString.split(',');
+	
+	var obj = {};
+	for (var p = 0; props.length > p; p++) {
+		var pair = props[p].split(':');
+		pair[1] = pair[1].replace(/'*/g, "");
+		obj[pair[0]] = pair[1];
+	}
+	return obj;
+}
+
 // JavaScript micro-templating, similar to John Resig's implementation.
 // Underscore templating handles arbitrary delimiters, preserves whitespace,
 // and correctly escapes quotes within interpolated code.
 // NB: `oldSettings` only exists for backwards compatibility.
 template = function(text, settings, oldSettings) {
 	if (!settings && oldSettings) settings = oldSettings;
-	settings = _.defaults({}, settings, templateSettings);
+	settings = templateSettings;
 	
 	// Combine delimiters into one regular expression via alternation.
 	var matcher = RegExp([
