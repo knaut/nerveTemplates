@@ -1394,7 +1394,7 @@ normalize = function(struct) {
 		var funcReturns = /return\s*/;
 		var src = struct.toString();
 		
-		var normalized = normalizeFunction( src );
+		normalized.push( normalizeFunction( src ) );
 
 		console.log(normalized);
 
@@ -1559,9 +1559,6 @@ normalizeFunction = function( func ) {
 
 	var normalizedReturnBlocks = normalize(parsedReturnBlocks);
 
-	// console.log(src, splitSrc)
-	console.log(slicedReturnBlocks);
-
 	// normalized return blocks are inner properties of code blocks
 	var script = func.toString();
 	// lose the whitespace
@@ -1569,18 +1566,17 @@ normalizeFunction = function( func ) {
 	script = script.split( rgfuncHead )[1];
 	script = script.split( rgfuncTail )[0];
 
-	console.log(script)
-
 	for ( var n = 0; slicedReturnBlocks.length > n; n++) {
-		console.log(keyword + slicedReturnBlocks[n])
-
 		script = script.replace( keyword + slicedReturnBlocks[n] , '%break%' );
 	}
-	script = script.split( '%break%' );
 
-	console.log(script)
+	var parsedFunc = {
+		tagName: 'function',
+		src: script,
+		inner: parsedReturnBlocks
+	}
 
-	return normalizedReturnBlocks;
+	return parsedFunc;
 }
 
 // separate the return block from the rest of the code and return it
