@@ -1534,6 +1534,8 @@ normalizeFunction = function( func ) {
 	rgfuncTail = /\s*[}]{1}\s*$/;		// eg last } bracket of the function
 	rgfuncReturns = /return\s*/;
 
+	var keyword = 'return';		// the string we look for when parsing return blocks
+
 	var src = func.toString();
 	src = src.split( src.match(rgfuncHead) )[1];
 	src = src.split( src.match(rgfuncTail) )[0];
@@ -1548,19 +1550,33 @@ normalizeFunction = function( func ) {
 	// we skip the first item, which is the src head
 
 	var parsedReturnBlocks = [];
+	var slicedReturnBlocks = [];
 	for (var i = 0; srcBody.length > i; i++) {
 		var trimmedSrcBody = srcBody[i].replace(/\s/g, "");
+		slicedReturnBlocks.push( sliceReturnBlock( trimmedSrcBody ) );
 		parsedReturnBlocks.push( parseReturnBlock( trimmedSrcBody ) );
 	}
 
 	var normalizedReturnBlocks = normalize(parsedReturnBlocks);
 
-	console.log(src, splitSrc)
-	console.log(normalizedReturnBlocks);
+	// console.log(src, splitSrc)
+	console.log(slicedReturnBlocks);
 
 	// normalized return blocks are inner properties of code blocks
 	var script = func.toString();
+	// lose the whitespace
+	script = script.replace(/\s/g, "");
 	script = script.split( rgfuncHead )[1];
+	script = script.split( rgfuncTail )[0];
+
+	console.log(script)
+
+	for ( var n = 0; slicedReturnBlocks.length > n; n++) {
+		console.log(keyword + slicedReturnBlocks[n])
+
+		script = script.replace( keyword + slicedReturnBlocks[n] , '%break%' );
+	}
+	script = script.split( '%break%' );
 
 	console.log(script)
 
