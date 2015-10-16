@@ -1108,14 +1108,6 @@ tf3 = {
 	}
 }
 
-tf4 = {
-	'#tf4': function( ) {
-		if (test) {
-
-		}
-	}
-}
-
 // in context, function args wouldn't mean much here, because their bodies
 // would be used by underscore during template rendering. these functions never get called,
 // they are just inlaid into the template
@@ -1400,16 +1392,11 @@ normalize = function(struct) {
 		var funcHead = /^function\s*[(][)]\s*[{]\s*/;	// eg 'function() { …'
 		var funcTail = /\s*[}]{1}\s*$/;		// eg last } bracket of the function
 		var funcReturns = /return\s*/;
-
-		console.log(type, struct);
 		var src = struct.toString();
+		
+		var normalized = normalizeFunction( src );
 
-		// var body = src.split(/function () {/)[1];
-		// console.log(src, body)
-		console.log( parseFunction( src ) );
-		// var obj = {
-		// 	'function': src
-		// }
+		console.log(normalized);
 
 	}
 
@@ -1428,7 +1415,7 @@ normalize = function(struct) {
 
 				// pass the normalized object to be parsed,
 				// continue with the object we recieve
-				console.log(key)
+				// console.log(key)
 				var parsed = parse(obj, key)
 
 				// unless its a string, we recurse over the nested
@@ -1564,7 +1551,7 @@ function occurrences(string, subString, allowOverlapping){
     return n;
 }
 
-parseFunction = function( func ) {
+normalizeFunction = function( func ) {
 	rgfuncHead = /^function\s*[(][)]\s*[{]\s*/;	// eg 'function() { …'
 	rgfuncTail = /\s*[}]{1}\s*$/;		// eg last } bracket of the function
 	rgfuncReturns = /return\s*/;
@@ -1588,12 +1575,22 @@ parseFunction = function( func ) {
 		parsedReturnBlocks.push( parseReturnBlock( trimmedSrcBody ) );
 	}
 
-	console.log(parsedReturnBlocks);
+	var normalizedReturnBlocks = normalize(parsedReturnBlocks);
 
-	return src;
+	console.log(src, splitSrc)
+	console.log(normalizedReturnBlocks);
+
+	// normalized return blocks are inner properties of code blocks
+	var script = func.toString();
+	script = script.split( rgfuncHead )[1];
+
+	console.log(script)
+
+	return normalizedReturnBlocks;
 }
 
-parseReturnBlock = function( string ) {
+// separate the return block from the rest of the code and return it
+sliceReturnBlock = function( string ) {
 	var enterBracesInt = 0;
 	var exitBracesInt = 0;
 	var sliceLength = 0;
@@ -1613,17 +1610,25 @@ parseReturnBlock = function( string ) {
 	}
 	
 	var slicedString = string.slice(0, sliceLength);
+	
+	return slicedString;
+}
+
+// take the return block as a string and return an object that can be normalized
+parseReturnBlock = function( string ) {
+	var slicedString = sliceReturnBlock(string);
 	slicedString = slicedString.replace('{', '');
 	slicedString = slicedString.replace('}', '');
 
 	var props = slicedString.split(',');
-	
 	var obj = {};
+
 	for (var p = 0; props.length > p; p++) {
 		var pair = props[p].split(':');
 		pair[1] = pair[1].replace(/'*/g, "");
 		obj[pair[0]] = pair[1];
 	}
+
 	return obj;
 }
 
