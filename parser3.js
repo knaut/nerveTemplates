@@ -1388,22 +1388,12 @@ normalize = function(struct) {
 		}
 	}
 
-	if (type === 'function') {
-		var funcHead = /^function\s*[(][)]\s*[{]\s*/;	// eg 'function() { …'
-		var funcTail = /\s*[}]{1}\s*$/;		// eg last } bracket of the function
-		var funcReturns = /return\s*/;
-		var src = struct.toString();
-		
-		normalized.push( normalizeFunction( src ) );
-
-		console.log(normalized);
-
-	}
+	
 
 	// scoping an array to push parsed objects to later
 	var newStruct = [];
 
-	if (type !== 'string') {
+	if (type === 'object' || type === 'array') {
 
 		// we loop through all structs at the root level
 		for (var i = 0; normalized.length > i; i++) {
@@ -1421,16 +1411,28 @@ normalize = function(struct) {
 				// unless its a string, we recurse over the nested
 				// inner objects
 
-				if (typeof parsed.inner !== 'string') {
+				console.log(typeof parsed.inner)
+				if (typeof parsed.inner === 'object' || typeof parsed.inner === 'array') {
+					parsed.inner = normalize(parsed.inner);
+				}
 
-					parsed.inner = normalize(parsed.inner);	
+				if (typeof parsed.inner === 'function') {
+					// console.log('blerg', struct);
+					parsed.inner = normalizeFunction( parsed.inner );
 					
+					// parsed.inner = normalized.push( normalizeFunction( struct ) );
 				}
 			}
 
 			newStruct.push(parsed)
 		}
-	}
+	} 
+
+	// if (type === 'function') {
+	// 	console.log('function', normalized)
+	// 	var parsedInner = normalized;
+
+	// }
 
 	// the final returned structure should be a normalized pattern,
 	// where every tag's is an object whose inner content is either a 
@@ -1530,14 +1532,16 @@ var escapeChar = function(match) {
 };
 
 normalizeFunction = function( func ) {
-	rgfuncHead = /^function\s*[(][)]\s*[{]\s*/;	// eg 'function() { …'
-	rgfuncTail = /\s*[}]{1}\s*$/;		// eg last } bracket of the function
-	rgfuncReturns = /return\s*/;
+	var rgfuncHead = /^function\s*[(][)]\s*[{]\s*/;	// eg 'function() { …'
+	var rgfuncTail = /\s*[}]{1}\s*$/;		// eg last } bracket of the function
+	var rgfuncReturns = /return\s*/;
 
 	var keyword = 'return';		// the string we look for when parsing return blocks
 
 	var src = func.toString();
+	console.log(src)
 	src = src.split( src.match(rgfuncHead) )[1];
+	console.log(src)
 	src = src.split( src.match(rgfuncTail) )[0];
 
 	var splitSrc = src.split('return');
