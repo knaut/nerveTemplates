@@ -1418,8 +1418,13 @@ normalize = function(struct) {
 
 				if (typeof parsed.inner === 'function') {
 					// console.log('blerg', struct);
-					parsed.inner = normalizeFunction( parsed.inner );
-					
+					parsed.inner = [ normalizeFunction( parsed.inner ) ];
+					if ( parsed.inner[0].hasOwnProperty('inner') && parsed.inner[0].inner.length) {
+
+						for ( var p = 0; parsed.inner[0].inner.length > p; p++ ) {
+							parsed.inner[0].inner[p] = normalize( parsed.inner[0].inner[p] )[0];
+						}
+					}
 					// parsed.inner = normalized.push( normalizeFunction( struct ) );
 				}
 			}
@@ -1450,38 +1455,59 @@ stringify = function(normalized) {
 
 	// iterate through the parsed object and
 	// modify the string
-	// console.log( typeof normalized, normalized )
+	console.log( typeof normalized, normalized )
 	if (typeof normalized === 'string') return;
 	
 	for (var n = 0; normalized.length > n; n++) {
 
 		var obj = normalized[n];
 
-		string += '<' + obj.tagName;
+		if (obj.tagName === 'function') {
+			console.log('stringify function', obj);
+			var splitSrc = obj.src.split('%break%');
+			
+			for (var ss = 0; splitSrc.length > ss; ss++) {
+				splitSrc[ss] = '<<' + splitSrc[ss] + '>>';
 
-		// id attribute
-		if (obj.id) {
-			string += ' id="' + obj.id + '"';
-		}
+				if (obj[ss] !== undefined) {
+					var stringifiedBlock = stringify( obj.inner[ss] );
+					string = splitSrc[ss] + stringifiedBlock;
+				}
+				
+			}
+			
+			// string = splitSrc.join('%break%');
+			console.log(string);
+			
+		} else {
 
-		// class attributes
-		if (obj.hasOwnProperty('classes') && obj.classes.length) {
-			string += ' class="' + obj.classes.join(' ') + '"';
-		}
+			string += '<' + obj.tagName;
 
-		// custom attributes
-		if (obj.hasOwnProperty('attrs') && obj.attrs.length) {
-			// loop through array of key/vals
-			for (var a = 0; obj.attrs.length > a; a++) {
-				var attr = obj.attrs[a];
-				for (var attrKey in attr) {
-					string += ' ' + attrKey + '="' + attr[attrKey] + '"'
+			// id attribute
+			if (obj.id) {
+				string += ' id="' + obj.id + '"';
+			}
+
+			// class attributes
+			if (obj.hasOwnProperty('classes') && obj.classes.length) {
+				string += ' class="' + obj.classes.join(' ') + '"';
+			}
+
+			// custom attributes
+			if (obj.hasOwnProperty('attrs') && obj.attrs.length) {
+				// loop through array of key/vals
+				for (var a = 0; obj.attrs.length > a; a++) {
+					var attr = obj.attrs[a];
+					for (var attrKey in attr) {
+						string += ' ' + attrKey + '="' + attr[attrKey] + '"'
+					}
 				}
 			}
-		}
 
-		// end the root tag
-		string += '>';
+			// end the root tag
+			string += '>';
+
+		}
 
 		if (obj.hasOwnProperty('inner') && obj.inner.length && typeof obj.inner !== 'string') {
 			// console.log(obj)
@@ -1490,9 +1516,13 @@ stringify = function(normalized) {
 			string += obj.inner;
 		}
 
-		string += '</' + obj.tagName + '>';
 
-		// console.log(string)
+		if (obj.tagName !== 'function') {
+			string += '</' + obj.tagName + '>';	
+		}
+		
+
+		console.log(string)
 	}
 
 	return string;
@@ -1539,9 +1569,7 @@ normalizeFunction = function( func ) {
 	var keyword = 'return';		// the string we look for when parsing return blocks
 
 	var src = func.toString();
-	console.log(src)
 	src = src.split( src.match(rgfuncHead) )[1];
-	console.log(src)
 	src = src.split( src.match(rgfuncTail) )[0];
 
 	var splitSrc = src.split('return');
