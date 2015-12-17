@@ -39,7 +39,7 @@ parseCSSKey = function( string ) {
 
 	var regx = {
 		attrs: /(\[\S*\])/,
-		'class': /(\.[a-zA-Z]*)/
+		'class': /(\.[^\.]*)/
 	}
 
 	// start with the tag name, which appears first in valid css selectors
@@ -87,6 +87,8 @@ parseCSSKey = function( string ) {
 		normalized.classes = classes;
 		// console.log('normalized classes', normalized);
 	}
+
+	console.log(key)
 
 	// parse custom attributes
 	if (regx.attrs.test( key )) {
