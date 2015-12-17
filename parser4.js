@@ -4,6 +4,48 @@
 tl = {
 	transform: function( struct ) {
 		// the main function, entry point for any template literal
+		console.log(struct);
+
+		var type = this.toType( struct );
+		var normalized = [];
+
+		if (type === 'object') {
+			var keys = Object.keys( struct );
+
+			for (var k = 0; keys.length > k; k++) {
+				var obj = {};
+				var key = keys[k];
+				var val = struct[key];
+
+				obj[key] = val;
+
+				normalized.push(obj);
+			}
+		}
+
+		console.log(type, normalized);
+
+		for (var i = 0; normalized.length > i; i++) {
+
+			var obj = normalized[i];
+
+			for ( var key in obj ) {
+
+				var parsed = this.parseCSSKey( key );
+				parsed.inner = obj[key]
+
+				console.log(parsed)
+			}
+		}
+
+		var innerType = this.toType( parsed.inner );
+
+		if (innerType === 'function') {
+			parsed.inner = this.parseFunction( parsed.inner )
+		}
+
+		console.log(parsed)
+
 	},
 
 	toType: function(obj) {
@@ -12,11 +54,11 @@ tl = {
 		var type = ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 		
 		// for components, we assume they will be capitalized or pascal cased
-		if (type === 'string') {
-			if (obj.toLowerCase() !== obj) {
-				type = 'component'
-			}
-		}
+		// if (type === 'string') {
+		// 	if (obj.toLowerCase() !== obj) {
+		// 		type = 'component'
+		// 	}
+		// }
 
 		return type;
 	},
@@ -91,22 +133,34 @@ tl = {
 
 				var obj = normalized[i];
 
+				// cycle through the keys
 				for (var key in obj) {
 
-					var parsed = this.parse( obj, key );
+					// parse keys as css selectors
+					var parsed = this.parseCSSKey( key );
+
+					// set inner as this key's value
+					console.log(key, obj[key])
+					// if (parsed)
+					parsed.inner = obj[key];
 
 					if (typeof parsed.inner === 'object' || typeof parsed.inner === 'array') {
 						parsed.inner = this.normalize( parsed.inner );
 					}
 
 					if (typeof parsed.inner === 'function') {
+						console.log(parsed.inner)
 						
 						parsed.inner = [
-							this.normalizeFunction( parsed.inner )
+							this.parseFunction( parsed.inner )
 						];
 
-						if ( parsed.inner[0].hasOwnProperty('inner') && parsed.inner[0].inner.length ) {
-
+						console.log(parsed.inner)
+						
+						// if ( parsed.inner[0].hasOwnProperty('inner') && parsed.inner[0].inner.length ) {
+						if ( parsed.inner[0].hasOwnProperty('inner') ) {
+						
+							console.log(parsed.inner[0].inner)
 							for ( var p = 0; parsed.inner[0].inner.length > p; p++ ) {
 								parsed.inner[0].inner[p] = this.normalize( parsed.inner[0].inner[0] )[0];
 							}
@@ -207,10 +261,10 @@ tl = {
 
 	},
 
-	parseCSSKey: function( key ) {
-		// parse a CSS key and normalize it as a a JS object
+	parseCSSKey: function( string ) {
+		// parse a CSS key and normalized it as a a JS object
 		/* 
-		normalized DOM:
+		normalized DOM example:
 			{
 				type: 'dom',
 				attrs: [ { data-val: 'value' } ],
@@ -220,10 +274,13 @@ tl = {
 				tagName: 'string'
 			}
 		*/
+		// console.log(string);
 
-		console.log(key);
+		// we'll reassign the incoming string and whittle it down until there's nothing left to iterate over
+		var key = string;
 
-		var normal = {
+		// create a blank normalized object
+		var normalized = {
 			type: 'dom',
 			attrs: [],
 			classes: [],
@@ -243,19 +300,103 @@ tl = {
 			attr: [ '[', ']' ]
 		};
 
+		var regx = {
+			id: /(#[^\s|\.]*)/,
+			attrs: /(\[\S*\])/,
+			'class': /(\.[^\.|\[|#]*)/
+		}
 
+		// start with the tag name, which appears first in valid css selectors
 		for (var d = 0; dom.length > d; d++) {
 			// if indexOf is 0, we know we've matched the string at the very beginning. in css selectors, this is the tag name
+			
 			if ( key.indexOf( dom[d] ) === 0 ) {
-				break;
-			} else {
-				// 'asdf' will match with 'a'
-				normal.tagName = dom[d];
+				// assign the tag name to the normalized object
+				normalized.tagName = dom[d];
+
+				// get rid of the tag name in our key
+				key = key.substring( dom[d].length );
+				
+			}
+		}
+
+		// default to div if no tagname, and we're not a blank string
+		if (normalized.tagName === undefined && key.length) {
+			normalized.tagName = 'div'
+		}
+
+		// parse id
+		if (key.indexOf( '#' ) > -1) {
+			var id = key.match( regx.id )[0];
+			id = id.split('#')[1];
+
+			normalized.id = id;
+
+			// reassign the key as a substring based on the length of the
+			// id, adding one for the '#'
+			key = key.substring( id.length + 1 );
+		}
+
+		// parse classes
+		if (key.indexOf( delimit.class ) > -1) {
+			// we split with a regex because it matches only relevent substrings
+			// string delimiters can catch trailing attribute selectors, etc.
+			var classSplit = key.split( regx.class );
+			
+			// a sanitized classes array
+			var classes = [];
+
+			for (var c = 0; classSplit.length > c; c++) {
+
+				// push to a sanitized array with only our class substrings
+				if (classSplit[c].indexOf('.') > -1) {
+
+					// replace the '.' part of the selector while we're at it
+					classes.push( classSplit[c].replace('.','') );
+
+					// get rid of the class substring in our key
+					key = key.replace( classSplit[c], '' );
+				}
+			}
+
+			// assign our sanitized classes array to the normalized object
+			normalized.classes = classes;
+			// console.log('normalized classes', normalized);
+		}
+
+		// parse custom attributes
+		if (regx.attrs.test( key )) {
+
+			var attrsArr = key.split('[');
+
+			// check for blanks
+			for (var v = 0; attrsArr.length > v; v++) {
+				if (attrsArr[v].length === 0) {
+					attrsArr.splice(v, 1);
+				}
+			}
+
+			// parse the key/val pairs
+			for (var a = 0; attrsArr.length > a; a++) {
+				
+				// clean up the attr declaration
+				var attrString = attrsArr[a].replace(']', '');
+
+				var attrPair = attrString.split('=');
+
+				var attr = {
+					attrKey: attrPair[0],
+					// get rid of any extra quotes
+					attrVal: attrPair[1].replace(/["']/g, "")
+				};
+
+				// push to normalized
+				normalized.attrs.push(attr);
 			}
 		}
 
 		
-
+		return normalized;
 	},
 
 	parseFunction: function( func ) {
@@ -282,11 +423,15 @@ tl = {
 		var slicedReturnBlocks = [];
 		for (var i = 0; srcBody.length > i; i++) {
 			var trimmedSrcBody = srcBody[i].replace(/\s/g, "");
-			slicedReturnBlocks.push( sliceReturnBlock( trimmedSrcBody ) );
-			parsedReturnBlocks.push( parseReturnBlock( trimmedSrcBody ) );
+			slicedReturnBlocks.push( this.sliceReturnBlock( trimmedSrcBody ) );
+			parsedReturnBlocks.push( this.parseReturnBlock( trimmedSrcBody ) );
 		}
 
-		var normalizedReturnBlocks = normalize(parsedReturnBlocks);
+		// console.log(parsedReturnBlocks)
+
+		var normalizedReturnBlocks = this.normalize(parsedReturnBlocks);
+		
+		// console.log(normalizedReturnBlocks)
 
 		// normalized return blocks are inner properties of code blocks
 		var script = func.toString();
@@ -300,10 +445,12 @@ tl = {
 		}
 
 		var parsedFunc = {
-			tagName: 'function',
+			type: 'function',
 			src: script,
 			inner: parsedReturnBlocks
 		}
+
+		// console.log(parsedFunc)
 
 		return parsedFunc;
 	},
@@ -335,18 +482,26 @@ tl = {
 
 	// take the return block as a string and return an object that can be normalized
 	parseReturnBlock: function( string ) {
-		var slicedString = sliceReturnBlock(string);
+		// console.log(string)
+		var slicedString = this.sliceReturnBlock(string);
 		slicedString = slicedString.replace('{', '');
 		slicedString = slicedString.replace('}', '');
 
 		var props = slicedString.split(',');
 		var obj = {};
 
+		// console.log(props)
+
 		for (var p = 0; props.length > p; p++) {
+
 			var pair = props[p].split(':');
+
 			pair[1] = pair[1].replace(/'*/g, "");
+
 			obj[pair[0]] = pair[1];
 		}
+
+		// console.log(obj)
 
 		return obj;
 	}

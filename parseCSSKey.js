@@ -101,8 +101,6 @@ parseCSSKey = function( string ) {
 		// console.log('normalized classes', normalized);
 	}
 
-	console.log(key)
-
 	// parse custom attributes
 	if (regx.attrs.test( key )) {
 
@@ -134,8 +132,7 @@ parseCSSKey = function( string ) {
 		}
 	}
 
-	console.log(normalized)
-
+	return normalized;
 }
 
 
