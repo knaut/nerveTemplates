@@ -4,7 +4,7 @@
 tl = {
 	transform: function( struct ) {
 		// the main function, entry point for any template literal
-		console.log(struct);
+		// console.log(struct);
 
 		var type = this.toType( struct );
 		var normalized = [];
@@ -23,7 +23,7 @@ tl = {
 			}
 		}
 
-		console.log(type, normalized);
+		// console.log(type, normalized);
 
 		for (var i = 0; normalized.length > i; i++) {
 
@@ -34,17 +34,35 @@ tl = {
 				var parsed = this.parseCSSKey( key );
 				parsed.inner = obj[key]
 
-				console.log(parsed)
+				// console.log(parsed)
 			}
 		}
 
 		var innerType = this.toType( parsed.inner );
 
+		console.log(innerType, parsed.inner)
+
 		if (innerType === 'function') {
-			parsed.inner = this.parseFunction( parsed.inner )
+			parsed.inner = [ this.parseFunction( parsed.inner ) ]
+
+			for ( var p = 0; parsed.inner[0].inner.length > p; p++ ) {
+				parsed.inner[0].inner[p] = this.transform( parsed.inner[0].inner[p] )[0];
+			}
+		}
+
+		if (innerType === 'array') {
+			for (var p = 0; parsed.inner.length > p; p++) {
+				parsed.inner[p] = this.transform( parsed.inner[p] )	
+			}
+		}
+		
+		if (innerType === 'object') {
+			console.log('found an object')
 		}
 
 		console.log(parsed)
+
+		return [ parsed ];
 
 	},
 
@@ -140,7 +158,7 @@ tl = {
 					var parsed = this.parseCSSKey( key );
 
 					// set inner as this key's value
-					console.log(key, obj[key])
+					// console.log(key, obj[key])
 					// if (parsed)
 					parsed.inner = obj[key];
 
@@ -149,18 +167,18 @@ tl = {
 					}
 
 					if (typeof parsed.inner === 'function') {
-						console.log(parsed.inner)
+						// console.log(parsed.inner)
 						
 						parsed.inner = [
 							this.parseFunction( parsed.inner )
 						];
 
-						console.log(parsed.inner)
+						// console.log(parsed.inner)
 						
 						// if ( parsed.inner[0].hasOwnProperty('inner') && parsed.inner[0].inner.length ) {
 						if ( parsed.inner[0].hasOwnProperty('inner') ) {
 						
-							console.log(parsed.inner[0].inner)
+							// console.log(parsed.inner[0].inner)
 							for ( var p = 0; parsed.inner[0].inner.length > p; p++ ) {
 								parsed.inner[0].inner[p] = this.normalize( parsed.inner[0].inner[0] )[0];
 							}
@@ -187,15 +205,15 @@ tl = {
 
 		// iterate through the parsed object and
 		// modify the string
-		console.log( typeof normalized, normalized )
+		// console.log( typeof normalized, normalized )
 		if (typeof normalized === 'string') return;
 		
 		for (var n = 0; normalized.length > n; n++) {
 
 			var obj = normalized[n];
 
-			if (obj.tagName === 'function') {
-				console.log('stringify function', obj);
+			if (obj.type === 'function') {
+				// console.log('stringify function', obj);
 				var splitSrc = obj.src.split('%break%');
 				
 				for (var ss = 0; splitSrc.length > ss; ss++) {
@@ -209,9 +227,10 @@ tl = {
 				}
 				
 				// string = splitSrc.join('%break%');
-				console.log(string);
+				// console.log(string);
 				
 			} else {
+
 
 				string += '<' + obj.tagName;
 
@@ -249,12 +268,12 @@ tl = {
 			}
 
 
-			if (obj.tagName !== 'function') {
+			if (obj.type !== 'function') {
 				string += '</' + obj.tagName + '>';	
 			}
 			
 
-			console.log(string)
+			// console.log(string)
 		}
 
 		return string;
