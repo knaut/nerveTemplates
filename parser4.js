@@ -52,13 +52,22 @@ tl = {
 
 		if (innerType === 'array') {
 			for (var p = 0; parsed.inner.length > p; p++) {
-				parsed.inner[p] = this.transform( parsed.inner[p] )	
+				parsed.inner[p] = this.transform( parsed.inner[p] );
 			}
 		}
 		
 		if (innerType === 'object') {
-			console.log('found an object')
+		// 	var innerKeys = Object.keys(parsed.inner);
+
+		// 	var normalizedInner = []
+		// 	for (var n = 0; innerKeys.length > n; n++) {
+		// 		console.log( parsed.inner[ innerKeys[n] ] )
+		// 	}
+
+			parsed.inner = this.transform( parsed.inner );
 		}
+
+
 
 		console.log(parsed)
 
