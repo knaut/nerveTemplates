@@ -38,8 +38,9 @@ parseCSSKey = function( string ) {
 	};
 
 	var regx = {
+		id: /(#[^\s|\.]*)/,
 		attrs: /(\[\S*\])/,
-		'class': /(\.[^\.]*)/
+		'class': /(\.[^\.|\[|#]*)/
 	}
 
 	// start with the tag name, which appears first in valid css selectors
@@ -59,6 +60,18 @@ parseCSSKey = function( string ) {
 			// 'asdf' will match with 'a'
 			break;
 		}
+	}
+
+	// parse id
+	if (key.indexOf( '#' ) > -1) {
+		var id = key.match( regx.id )[0];
+		id = id.split('#')[1];
+
+		normalized.id = id;
+
+		// reassign the key as a substring based on the length of the
+		// id, adding one for the '#'
+		key = key.substring( id.length + 1 );
 	}
 
 	// parse classes
