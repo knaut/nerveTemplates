@@ -50,18 +50,18 @@ tr2 = {
 
 
 
-normalizeDom
-	parseSelector
-	normalize
+// normalizeDom
+// 	parseSelector
+// 	normalize
 	
-normalizeFunction
-	sliceReturnBlock
-	parseReturnBlock
+// normalizeFunction
+// 	sliceReturnBlock
+// 	parseReturnBlock
 
-normalizeComponent
+// normalizeComponent
 
-stringifyDom
-stringifyFunction
+// stringifyDom
+// stringifyFunction
 
 
 

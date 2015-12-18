@@ -1081,7 +1081,7 @@ var nerve = (function( templateStruct, data ) {
 				}
 				
 				string = splitSrc.join('%break%');
-				console.log(string);
+				console.log(string, split);
 				
 			} else {
 

@@ -1,5 +1,5 @@
 parseCSSKey = function( string ) {
-	// parse a CSS key and normalizedize it as a a JS object
+	// parse a CSS key and normalize it as a a JS object
 	/* 
 	normalized DOM example:
 		{
