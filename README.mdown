@@ -34,7 +34,7 @@ Writing templates as normal Javascript lets us embed them in Components or Views
 
 HTML syntax (XML) isn't fun to write by hand (/opinion).
 
-CSS selectors represent DOM elememts well in a terse syntax that is expressive and well understood.
+CSS selectors represent DOM elements well in a terse syntax that is expressive and well understood.
 
 JSON models nested hierarchies well, like XML/HTML.
 
