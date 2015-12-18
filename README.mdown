@@ -1,0 +1,164 @@
+# Nerve Templates
+Write HTML templates like Javascript data structures
+
+!! Nerve is a work in progress and does not currently have a release candidate, use at your own risk
+
+# The Nutshell
+
+Take something like this, where the keys of an object literal are CSS selectors:
+
+	{ 'div.some-class-1': {
+			'ul.my-list[data-attr="custom"]': [
+				{
+					li: '{{foo}}'
+				},
+				{
+					li: '{{bar}}'
+				}
+			]
+		}
+	}
+
+Turn it into an HTML template we could hand to something like Handlebars or Underscore:
+
+	<div class="some-class-1">
+		<ul class="my-list" data-attr="custom">
+			<li>{{foo}}</li>
+			<li>{{bar}}</li>
+		</ul>
+	</div>
+
+# Why?
+
+Writing templates as normal Javascript lets us embed them in Components or Views without string concatenation or importing them as HTML files.
+
+HTML syntax (XML) isn't fun to write by hand (/opinion).
+
+CSS selectors represent DOM elememts well in a terse syntax that is expressive and well understood.
+
+JSON models nested hierarchies well, like XML/HTML.
+
+For science, and fun.
+
+# The Pain
+
+	{
+		div#someId: 'fubar'
+	}
+
+	// Syntax Error!
+
+We can get around the characters in CSS selectors that we can't write in the keys of an object literal by wrapping them in quotes, explicitly stating that the key is a string.
+
+	{
+		'div#someId': 'fubar'
+	}
+
+	// <div id="someId">fubar</div>
+
+# Current Status
+As of 12/17/15 the functions in parser3.js can be implemented as such:
+
+	stringify( normalize( testStructure ) );
+
+A test structure as complex as this:
+
+	testStructure = {
+		'#a.foo[data-val=1][data-val="a"]': {
+			'#b.bar[data-val=2]': {
+				'#c.baz.banksy[data-val=3]': 'hello World!'
+			},
+
+			'#d.bar[data-val=4]': {
+				'#e.baz.banksy[data-val=5]': [{
+						'div': 'blah'
+					}, {
+						'div': 'blah'
+					}, {
+						'div': 'blah'
+					}, {
+						'span': 'this is just a test template'
+					}, {
+						'div#amazing.my-other-class': 'a series of nested elements…'
+					}, {
+						'nav': {
+							'span': 'this is a nested child'
+						}
+					}, {
+						'div': 'blah'
+					}
+				]
+			}
+		}
+	}
+
+Will yield:
+
+	<div id="a" class="foo" data-val="1" data-val="a">
+	    <div id="b" class="bar" data-val="2">
+	        <div id="c" class="baz banksy" data-val="3">hello World!</div>
+	    </div>
+	    <div id="d" class="bar" data-val="4">
+	        <div id="e" class="baz banksy" data-val="5">
+	            <div>blah</div>
+	            <div>blah</div>
+	            <div>blah</div><span>this is just a test template</span>
+	            <div id="amazing" class="my-other-class">a series of nested elements…</div>
+	            <nav><span>this is a nested child</span></nav>
+	            <div>blah</div>
+	        </div>
+	    </div>
+	</div>
+
+## Todos
+### Inline Scripting
+
+Templates need logic. What if we use functions to embed logic in our templates?
+
+Assuming a templating syntax like ~~interpolate~~ and <<evaluate>>
+	
+	template = {
+		'div.blah': function() {
+			if (message) {
+				return {
+					span: '~~message~~'
+				}
+			} else {
+				return {
+					span: 'bob'
+				}
+			}
+		}
+	}
+
+Should yield:
+
+	<div class="foo">
+		<<if(message){>>
+			<span>~~message~~</span>
+		<<}else{>>
+			<span>bar</span>
+		<<}>>
+	</div>
+
+Given an Underscore-like templating function and data object:
+
+	render({
+		message: 'moe'
+	})
+
+Should yield:
+
+	<div class="foo">
+		<span>moe</span>
+	</div>
+
+parser4.js attempts this. Its goal is to parse functions as source code where the return blocks are nested templates. This way we can write functions as containers for logic that will be inlined later.
+
+### Modularize
+
+Isolate functions better. Correctly insert nested logic for inline scripting. Dealing with edge cases. Testability.
+
+# License
+
+MIT
