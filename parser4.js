@@ -52,6 +52,7 @@ tl = {
 
 		if (innerType === 'array') {
 			for (var p = 0; parsed.inner.length > p; p++) {
+				console.log( parsed.inner[p] )
 				parsed.inner[p] = this.transform( parsed.inner[p] );
 			}
 		}
@@ -235,7 +236,7 @@ tl = {
 					
 				}
 				
-				// string = splitSrc.join('%break%');
+				string = splitSrc.join('%break%');
 				// console.log(string);
 				
 			} else {
