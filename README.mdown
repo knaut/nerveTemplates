@@ -115,7 +115,7 @@ Will yield:
 
 Templates need logic. What if we use functions to embed logic in our templates?
 
-Assuming a templating syntax like ~~interpolate~~ and <<evaluate>>
+Assuming a templating syntax like ~~ interpolate ~~ and << evaluate >>
 	
 	template = {
 		'div.blah': function() {
