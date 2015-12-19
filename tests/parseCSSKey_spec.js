@@ -8,19 +8,21 @@ var testSelectors = [
 	'a[data-val="blah"][data-val="blah"]'
 ];
 
-var testSelector = function(selector) {
-	var parsedKey = parseCSSKey(selector);
 
-	describe('parseCSSKey: ' + "'" + selector + "'", function() {
+var testSelector = function( selector ) {
+	
+	var parsed = parseCSSKey.parseSelector( selector );
+
+	describe('parseCSSKey.parseSelector(' + selector + ')', function() {
 
 		it('should return an object from a CSS selector string', function() {
 
-			expect(toType(parsedKey)).toEqual('object');
+			expect(toType(parsed)).toEqual('object');
 
 		});
 
 		it('should have keys of type, attrs, classes, id, and tagName', function() {
-			var actualKeys = Object.keys(parsedKey).sort();
+			var actualKeys = Object.keys(parsed).sort();
 
 			var expectedKeys = [
 				'type',
@@ -35,8 +37,8 @@ var testSelector = function(selector) {
 		});
 
 		describe('key of type', function() {
-			it('should be "dom"', function() {
-				expect(parsedKey.type).toBe('dom');
+			it('should be "html"', function() {
+				expect(parsed.type).toBe('html');
 			})
 		});
 
@@ -44,9 +46,9 @@ var testSelector = function(selector) {
 			it('should be string or null', function() {
 				// testing with brute force
 				// doing this until custom matchers work
-				if ( toType(parsedKey.id) === 'string' ) {
+				if ( toType(parsed.id) === 'string' ) {
 					expect( true ).toBe( true );
-				} else if ( toType(parsedKey.id) === 'null' ) {
+				} else if ( toType(parsed.id) === 'null' ) {
 					expect( true ).toBe( true );
 				} else {
 					// force a fail
@@ -55,7 +57,7 @@ var testSelector = function(selector) {
 			});
 		});
 
-		describe('key of tagName ' + "'" + parsedKey.tagName + "'", function() {
+		describe('key of tagName ' + "'" + parsed.tagName + "'", function() {
 			
 			// list of all possible dom tags
 			var dom = [
@@ -86,7 +88,7 @@ var testSelector = function(selector) {
 
 				var needleExists = false;
 				for (var d = 0; dom.length > d; d++) {
-					if ( parsedKey.tagName === dom[d]) {
+					if ( parsed.tagName === dom[d]) {
 						needleExists = true;
 					}
 				}
@@ -98,15 +100,15 @@ var testSelector = function(selector) {
 
 		describe('key of classes', function() {
 			it('should be an array', function() {
-				expect( toType( parsedKey.classes ) ).toBe('array');
+				expect( toType( parsed.classes ) ).toBe('array');
 			});
 
-			if ( parsedKey.classes.length ) {
+			if ( parsed.classes.length ) {
 				it('should only contain strings', function() {
 
 					var needle = true;
-					for (var c = 0; parsedKey.classes.length > c; c++) {
-						if ( toType( parsedKey.classes[c] ) !== 'string' ) {
+					for (var c = 0; parsed.classes.length > c; c++) {
+						if ( toType( parsed.classes[c] ) !== 'string' ) {
 							needle = false;
 						}
 					}
@@ -118,15 +120,15 @@ var testSelector = function(selector) {
 
 		describe('key of attrs', function() {
 			it('should be an array', function() {
-				expect( toType( parsedKey.attrs ) ).toBe('array');
+				expect( toType( parsed.attrs ) ).toBe('array');
 			});
 
-			if ( parsedKey.attrs.length ) {
+			if ( parsed.attrs.length ) {
 				it('should only contain objects', function() {
 
 					var needle = true;
-					for (var c = 0; parsedKey.classes.length > c; c++) {
-						if ( toType( parsedKey.classes[c] ) !== 'object' ) {
+					for (var c = 0; parsed.classes.length > c; c++) {
+						if ( toType( parsed.classes[c] ) !== 'object' ) {
 							needle = false;
 						}
 					}
@@ -135,14 +137,15 @@ var testSelector = function(selector) {
 				});
 			}
 		});
-
 	});
+	
 }
+
 
 // to test all example selectors
 for (var v = 0; testSelectors.length > v; v++) {
 	testSelector( testSelectors[v] );
 }
 
-// to test just the simplest
-// testSelector(testSelectors[1]);
+// to test just one
+// testSelector(testSelectors[0]);

@@ -1,4 +1,4 @@
-(function parseCssKey() {
+var parseCSSKey = (function() {
 
 	return {
 		parseSelector: function(string) {
