@@ -43,7 +43,6 @@ normalize = function( struct ) {
 
 				for (var key in obj) {
 					var parsed = parseCSSKey.parseSelector( key );
-
 					parsed.inner = normalize( obj[key] );
 				}
 
@@ -51,12 +50,24 @@ normalize = function( struct ) {
 			}
 		break;
 		case 'object':
-			for (var key in struct) {
-				var parsed = parseCSSKey.parseSelector( key );
-				parsed.inner = normalize( struct[key] );
+
+			var keys = Object.keys( struct );
+
+			for (var k = 0; keys.length > k; k++) {
+				var obj = {};
+				var key = keys[k];
+				var val = struct[key];
+
+				obj[key] = val;
+
+				for (var keyS in obj) {
+					var parsed = parseCSSKey.parseSelector( keyS );
+					parsed.inner = normalize( struct[keyS] );
+				}
+
+				normalized.push(parsed);
 			}
 
-			normalized.push( parsed );
 		break;
 	}
 
