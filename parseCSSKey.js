@@ -1,155 +1,157 @@
-parseCSSKey = function( string ) {
-	// parse a CSS key and normalize it as a a JS object
-	/* 
-	normalized DOM example:
-		{
-			type: 'dom',
-			attrs: [ { data-val: 'value' } ],
-			classes: [ 'className' ],
-			id: 'string',
-			inner: [],
-			tagName: 'string'
-		}
-	*/
-	// console.log(string);
+(function parseCssKey() {
 
-	// we'll reassign the incoming string and whittle it down until there's nothing left to iterate over
-	var key = string;
+	return {
+		parseSelector: function(string) {
+			// parse a CSS selector and normalize it as a a JS object
+			/* 
+			example:
+				{
+					type: 'dom',
+					attrs: [ { 
+						attrKey: 'data-val'
+						attrVal: 'value' } ],
+					classes: [ 'className' ],
+					id: 'string',
+					inner: [],
+					tagName: 'string'
+				}
+			*/
 
-	// create a blank normalized object
-	var normalized = {
-		type: 'dom',
-		attrs: [],
-		classes: [],
-		id: undefined,
-		inner: [],
-		tagName: undefined
-	};
-
-	// list of all possible dom tags
-	var dom = [
-		'div', 'a', 'p', 'span', 'ul', 'li', 'header', 'article', 'section', 'nav', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre'
-	];
-
-	var delimit = {
-		'class': '.',
-		id: '#',
-		attr: [ '[', ']' ]
-	};
-
-	var regx = {
-		id: /(#[^\s|\.]*)/,
-		attrs: /(\[\S*\])/,
-		'class': /(\.[^\.|\[|#]*)/
-	}
-
-	// start with the tag name, which appears first in valid css selectors
-	for (var d = 0; dom.length > d; d++) {
-		// if indexOf is 0, we know we've matched the string at the very beginning. in css selectors, this is the tag name
-		
-		if ( key.indexOf( dom[d] ) === 0 ) {
-			// assign the tag name to the normalized object
-			normalized.tagName = dom[d];
-
-			// get rid of the tag name in our key
-			key = key.substring( dom[d].length );
-			
-		} else {
-			// default to div
-			normalized.tagName = 'div';
-			// 'asdf' will match with 'a'
-			break;
-		}
-	}
-
-	// parse id
-	if (key.indexOf( '#' ) > -1) {
-		var id = key.match( regx.id )[0];
-		id = id.split('#')[1];
-
-		normalized.id = id;
-
-		// reassign the key as a substring based on the length of the
-		// id, adding one for the '#'
-		key = key.substring( id.length + 1 );
-	}
-
-	// parse classes
-	if (key.indexOf( delimit.class ) > -1) {
-		// we split with a regex because it matches only relevent substrings
-		// string delimiters can catch trailing attribute selectors, etc.
-		var classSplit = key.split( regx.class );
-		
-		// a sanitized classes array
-		var classes = [];
-
-		for (var c = 0; classSplit.length > c; c++) {
-
-			// push to a sanitized array with only our class substrings
-			if (classSplit[c].indexOf('.') > -1) {
-
-				// replace the '.' part of the selector while we're at it
-				classes.push( classSplit[c].replace('.','') );
-
-				// get rid of the class substring in our key
-				key = key.replace( classSplit[c], '' );
-			}
-		}
-
-		// assign our sanitized classes array to the normalized object
-		normalized.classes = classes;
-		// console.log('normalized classes', normalized);
-	}
-
-	// parse custom attributes
-	if (regx.attrs.test( key )) {
-
-		var attrsArr = key.split('[');
-
-		// check for blanks
-		for (var v = 0; attrsArr.length > v; v++) {
-			if (attrsArr[v].length === 0) {
-				attrsArr.splice(v, 1);
-			}
-		}
-
-		// parse the key/val pairs
-		for (var a = 0; attrsArr.length > a; a++) {
-			
-			// clean up the attr declaration
-			var attrString = attrsArr[a].replace(']', '');
-
-			var attrPair = attrString.split('=');
-
-			var attr = {
-				attrKey: attrPair[0],
-				// get rid of any extra quotes
-				attrVal: attrPair[1].replace(/["']/g, "")
+			var parsed = {
+				type: 'html',
+				tagName: 'div', // default element
+				attrs: [],
+				classes: [],
+				id: ''
 			};
 
-			// push to normalized
-			normalized.attrs.push(attr);
+			// check for attributes
+			if (string.indexOf('[') > -1) {
+				parsed.attrs = this.parseAttrs(string);
+			}
+
+			// check for classes
+			if (string.indexOf('.') > -1) {
+				parsed.classes = this.parseClasses(string);
+			}
+
+			// check for id
+			if (string.indexOf('#') > -1) {
+				parsed.id = this.parseId(string);
+			}
+
+			// check for tag name
+			if (this.parseTagName(string)) {
+				parsed.tagName = this.parseTagName(string);
+			}
+
+			return parsed;
+		},
+
+		parseTagName: function(string) {
+			// parse a selector with an element name
+			var reg = /^\w*/;
+
+			var tag = string.match(reg)[0];
+
+			if (!tag) {
+				return false;
+			} else {
+				// list of supported dom tags
+				var dom = [
+					'div',
+					'a',
+					'p',
+					'span',
+					'ul',
+					'li',
+					'header',
+					'article',
+					'section',
+					'nav',
+					'footer',
+					'h1',
+					'h2',
+					'h3',
+					'h4',
+					'h5',
+					'h6',
+					'pre',
+					'em'
+				];
+
+				for (var d = 0; dom.length > d; d++) {
+					if (dom[d] === tag) {
+						return tag;
+					}
+				}
+			}
+		},
+
+		parseId: function(string) {
+			// parse a selector with an id
+			// and extract the id
+			var reg = /#[\w|-]*/;
+
+			var id = string.match(reg)[0].substring(1);
+
+			return id;
+		},
+
+		parseClasses: function(string) {
+			// parse a selector with at least one class
+			var reg = /\.[\w|-]*/g;
+
+			var classes = string.match(reg);
+
+			var parsed = [];
+			for (var c = 0; classes.length > c; c++) {
+				// chop off the .
+				var classString = classes[c].substring(1);
+				parsed.push(classString)
+			}
+
+			return parsed;
+		},
+
+		parseAttrs: function(string) {
+			var reg = /\[.+\]/g;
+
+			// we will only accept attributes grouped together in the selector
+			var attrs = string.match(reg);
+
+			// treat the attrs as an array, even if there's only one
+			if (attrs[0].indexOf('][') > -1) {
+				attrs = attrs[0].split('][');
+			}
+
+			// push the parsed pairs to an array for later
+			var parsed = [];
+
+			for (var i = 0; attrs.length > i; i++) {
+
+				// clean up everything
+				var attr = attrs[i].replace(/'|"|\[|\]/g, '');
+
+				// only assume the attr has a key
+				var pair = {};
+				if (attr.indexOf('=') > -1) {
+					var split = attr.split('=');
+					pair = {
+						attrKey: split[0],
+						attrVal: split[1]
+					};
+					parsed.push(pair);
+				} else {
+					pair = {
+						attrKey: attr,
+						attrVal: null
+					}
+					parsed.push(pair);
+				}
+			}
+
+			return parsed;
 		}
 	}
-
-	return normalized;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+})();
