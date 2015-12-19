@@ -8,7 +8,6 @@ var testSelectors = [
 	'a[data-val="blah"][data-val="blah"]'
 ];
 
-
 var testSelector = function( selector ) {
 	
 	var parsed = parseCSSKey.parseSelector( selector );

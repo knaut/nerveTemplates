@@ -12,7 +12,6 @@ var parseCSSKey = (function() {
 						attrVal: 'value' } ],
 					classes: [ 'className' ],
 					id: 'string',
-					inner: [],
 					tagName: 'string'
 				}
 			*/
