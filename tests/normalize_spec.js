@@ -1,73 +1,28 @@
-var testStructures = [
-	template
-];
+var normalized = normalize(template)
 
-// we can test normalized template structures by comparing them with their
-// associated template objects.
-// if the nested structure matches, we can be sure we're not missing
-// any elements.
-
-testStructure = function( struct ) {
-	console.log(struct, normalize( struct ));
-
-	describe('template type', function() {
-		it('should be an object', function() {
-			expect(toType(struct)).toEqual('object');
-		});
+describe('normalized', function() {
+	it('should be an array', function() {
+		expect( toType( normalized ) ).toEqual('array');
 	});
 
-	var normalized = normalize(struct);
-	
-	describe('normalized structure', function() {
-		it('should be an array', function() {
-			expect(toType(normalized)).toEqual('array');
-		});
-	});
+	// only single root supported atm
+	// it('should have a single root', function() {
+	// 	expect( normalized.length ).toEqual(1);
+	// });
 
-	// traverse our normalized structure with our original template structure,
-	// ensuring that we've achieved fidelity from template to normalized
-	describe('for every key in the template structure', function() {
-		for (var key in struct) {
-			it('the value should be an object, array, or string', function() {
-				var isValid = false;
-				var keyType = toType(struct[key]);
+	// check for inner
+	it('should have a property "inner" that is a string or array', function() {
+		expect( normalized.hasOwnProperty('inner') ).toEqual(true);
+		console.log( normalized)
+		var isStringOrArray = false;
+		for (var n = 0; normalized.length > n; n++) {
+			console.log( toType(normalized[n].inner))
+			if ( toType( normalized[n].inner ) === 'string' || toType( normalized[n].inner ) === 'array' ) {
 				
-				if (keyType === 'object' || keyType === 'array' || keyType === 'string') {
-					isValid = true;
-				}
-
-				expect(isValid).toEqual(true);
-			});
+				isStringOrArray = true;
+				console.log(isStringOrArray)
+			}	
 		}
+		expect( isStringOrArray ).toEqual(true);
 	});
-	
-
-
-
-	// get the number of keys
-	var normalizedKeysLength = Object.keys(normalized).length;
-
-	// describe('testing normalized structure', function() {
-		
-	// 	var testStructKeysLength = Object.keys(struct).length;
-		
-	// 	it('should have the same number of keys (' + normalizedKeysLength + ') as its template (' + testStructKeysLength + ') at the root level', function() {
-	// 		expect( normalizedKeysLength ).toEqual( testStructKeysLength );
-	// 		// console.log(normalized.inner)
-	// 		if (normalized[0].hasOwnProperty('inner')) {
-	// 			testInner
-	// 		}
-	// 	});
-	// })
-}
-
-var testInner = function( struct ) {
-
-}
-
-for (var v = 0; testStructures.length > v; v++) {
-	testStructure( testStructures[v] );
-}
-
-// to test just one
-// testSelector(testSelectors[0]);
+})
