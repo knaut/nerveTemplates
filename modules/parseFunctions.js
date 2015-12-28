@@ -33,7 +33,7 @@ var functionParser = (function() {
 
 			var normalizedReturnBlocks = normalize(parsedReturnBlocks);
 			
-			console.log(normalizedReturnBlocks)
+			// console.log(normalizedReturnBlocks)
 
 			// normalized return blocks are inner properties of code blocks
 			var script = func.toString();
