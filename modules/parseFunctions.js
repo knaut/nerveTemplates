@@ -29,11 +29,11 @@ var functionParser = (function() {
 				parsedReturnBlocks.push( this.parseReturnBlock( trimmedSrcBody ) );
 			}
 
-			// console.log(parsedReturnBlocks)
-
-			var normalizedReturnBlocks = this.normalize(parsedReturnBlocks);
 			
-			// console.log(normalizedReturnBlocks)
+
+			var normalizedReturnBlocks = normalize(parsedReturnBlocks);
+			
+			console.log(normalizedReturnBlocks)
 
 			// normalized return blocks are inner properties of code blocks
 			var script = func.toString();
@@ -49,7 +49,7 @@ var functionParser = (function() {
 			var parsedFunc = {
 				type: 'function',
 				src: script,
-				inner: parsedReturnBlocks
+				inner: normalizedReturnBlocks
 			}
 
 			// console.log(parsedFunc)

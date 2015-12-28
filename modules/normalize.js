@@ -50,7 +50,6 @@ var normalize = function( struct ) {
 			}
 		break;
 		case 'object':
-
 			var keys = Object.keys( struct );
 
 			for (var k = 0; keys.length > k; k++) {
@@ -67,7 +66,9 @@ var normalize = function( struct ) {
 
 				normalized.push(parsed);
 			}
-
+		break;
+		case 'function':
+			normalized.push( functionParser.parseFunction( struct ) );
 		break;
 	}
 
