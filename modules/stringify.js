@@ -5,19 +5,21 @@ var stringify = (function() {
 			// let one do function do one thing:
 			// take a normalized structure and recursively stringify it
 
+			var string = '';
 			for (var n = 0; normalized.length > n; n++) {
 				var normalizedType = toType(normalized[n]);
 
 				switch (normalizedType) {
 					case 'object':
-						var stringifiedObj = stringify.object(normalized[n]);
-						return stringifiedObj;
+						string += stringify.object(normalized[n]);
+						
 					break;
 					case 'string':
 						console.log('let me know')
 					break;
 				}
 			}
+			return string;
 		},
 
 		object: function(obj) {
