@@ -153,7 +153,8 @@ Should yield:
 		<span>moe</span>
 	</div>
 
-parser4.js attempts this. Its goal is to parse functions as source code where the return blocks are nested templates. This way we can write functions as containers for logic that will be inlined later.
+The current stringify module is capable of rendering simple functions like this with return blocks nested in control structures.
+The functions are parsed as strings, and are never really executed. They are just containers for logic that will be inlined later.
 
 ### Modularize
 
