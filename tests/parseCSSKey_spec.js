@@ -10,9 +10,9 @@ var testSelectors = [
 
 var testSelector = function( selector ) {
 	
-	var parsed = parseCSSKey.parseSelector( selector );
+	var parsed = parse.css.selector( selector );
 
-	describe('parseCSSKey.parseSelector(' + selector + ')', function() {
+	describe('parse.css.selector(' + selector + ')', function() {
 
 		it('should return an object from a CSS selector string', function() {
 
@@ -81,7 +81,7 @@ var testSelector = function( selector ) {
 				'em'
 			];
 
-			// parseCSSKey automatically corrects non-DOM selectors as divs,
+			// sautomatically corrects non-DOM selectors as divs,
 			// so this is pretty much guaranteed
 			it('should be a valid DOM selector', function() {
 

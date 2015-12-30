@@ -42,7 +42,7 @@ var normalize = function( struct ) {
 				var obj = struct[i];
 
 				for (var key in obj) {
-					var parsed = parseCSSKey.parseSelector( key );
+					var parsed = parse.css.selector( key );
 					parsed.inner = normalize( obj[key] );
 				}
 
@@ -60,7 +60,7 @@ var normalize = function( struct ) {
 				obj[key] = val;
 
 				for (var keyS in obj) {
-					var parsed = parseCSSKey.parseSelector( keyS );
+					var parsed = parse.css.selector( keyS );
 					parsed.inner = normalize( struct[keyS] );
 				}
 
@@ -68,7 +68,7 @@ var normalize = function( struct ) {
 			}
 		break;
 		case 'function':
-			normalized.push( functionParser.parseFunction( struct ) );
+			normalized.push( parse.functions.normalize( struct ) );
 		break;
 	}
 

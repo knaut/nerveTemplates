@@ -84,7 +84,7 @@ var stringify = (function() {
 				// loop through array of key/vals
 				for (var a = 0; obj.attrs.length > a; a++) {
 					var attr = obj.attrs[a];
-					console.log(attr)
+
 					for (var attrKey in attr) {
 						string += ' '
 					}

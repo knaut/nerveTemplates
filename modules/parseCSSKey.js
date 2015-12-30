@@ -1,7 +1,7 @@
 var parseCSSKey = (function() {
 
 	return {
-		parseSelector: function(string) {
+		selector: function(string) {
 			// parse a CSS selector and normalize it as a a JS object
 			/* 
 			example:
@@ -26,28 +26,28 @@ var parseCSSKey = (function() {
 
 			// check for attributes
 			if (string.indexOf('[') > -1) {
-				parsed.attrs = this.parseAttrs(string);
+				parsed.attrs = this.attrs(string);
 			}
 
 			// check for classes
 			if (string.indexOf('.') > -1) {
-				parsed.classes = this.parseClasses(string);
+				parsed.classes = this.classes(string);
 			}
 
 			// check for id
 			if (string.indexOf('#') > -1) {
-				parsed.id = this.parseId(string);
+				parsed.id = this.id(string);
 			}
 
 			// check for tag name
-			if (this.parseTagName(string)) {
-				parsed.tagName = this.parseTagName(string);
+			if (this.tagName(string)) {
+				parsed.tagName = this.tagName(string);
 			}
 
 			return parsed;
 		},
 
-		parseTagName: function(string) {
+		tagName: function(string) {
 			// parse a selector with an element name
 			var reg = /^\w*/;
 
@@ -87,7 +87,7 @@ var parseCSSKey = (function() {
 			}
 		},
 
-		parseId: function(string) {
+		id: function(string) {
 			// parse a selector with an id
 			// and extract the id
 			var reg = /#[\w|-]*/;
@@ -97,7 +97,7 @@ var parseCSSKey = (function() {
 			return id;
 		},
 
-		parseClasses: function(string) {
+		classes: function(string) {
 			// parse a selector with at least one class
 			var reg = /\.[\w|-]*/g;
 
@@ -113,7 +113,7 @@ var parseCSSKey = (function() {
 			return parsed;
 		},
 
-		parseAttrs: function(string) {
+		attrs: function(string) {
 			var reg = /\[.+\]/g;
 
 			// we will only accept attributes grouped together in the selector

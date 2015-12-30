@@ -1,7 +1,7 @@
 var functionParser = (function() {
 	
 	return {
-		parseFunction: function( func ) {
+		normalize: function( func ) {
 			var rgfuncHead = /^function\s*[(][)]\s*[{]\s*/;	// eg 'function() { …'
 			var rgfuncTail = /\s*[}]{1}\s*$/;		// eg last } bracket of the function
 			var rgfuncReturns = /return\s*/;

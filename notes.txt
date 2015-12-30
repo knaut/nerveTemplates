@@ -1,0 +1,13 @@
+// desired-like api
+
+nerve.parse.css.selector( 'div.class' );
+
+nerve.parse.functions.sliceReturnBlock('blah blah return {div:"blah"} blah blah');
+nerve.parse.functions.parseReturnBlock('blah blah return {div:"blah"} blah blah');
+
+nerve.parse.css.tagName('div');
+
+nerve.stringify.html( normalizedHtml );
+
+nerve.stringify.normalized( normalizedArray );
+
