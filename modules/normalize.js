@@ -31,6 +31,7 @@ var normalize = function( struct ) {
 	]
 	*/
 	var normalized = [];
+	var children = [];
 
 	switch( toType(struct) ) {
 		case 'string':
@@ -71,7 +72,15 @@ var normalize = function( struct ) {
 			normalized.push( parse.functions.normalize( struct ) );
 		break;
 		case 'component':
-			normalized = normalize( struct.template );
+			console.log('found component!', struct);
+			// this would dump the rendered template of the nested component into the next one
+			// normalized = normalize( struct.template );
+			// var normalStruct = normalize( struct.template );
+
+			console.log(this)
+
+			this.children.push( struct );
+
 		break;
 	}
 

@@ -1,4 +1,4 @@
-toType = function(obj) {
+var toType = function(obj) {
 	// better type checking
 	// https://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/
 	if (obj.hasOwnProperty('type') && obj.type === 'component') {
