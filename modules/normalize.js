@@ -70,6 +70,9 @@ var normalize = function( struct ) {
 		case 'function':
 			normalized.push( parse.functions.normalize( struct ) );
 		break;
+		case 'component':
+			normalized = normalize( struct.template );
+		break;
 	}
 
 	return normalized;
