@@ -1,42 +1,58 @@
-# Nerve Templates
-Write HTML templates like Javascript data structures
+# Nerve
+Write HTML templates as Javascript data structures. Use CSS keys to describe DOM elements in a hierarchical style like JSON.
 
-!! Nerve is a work in progress and does not currently have a release candidate, use at your own risk
+WIP Warning: Nerve is a work in progress. Use at your own risk.
 
 # The Nutshell
 
-Take something like this, where the keys of an object literal are CSS selectors:
+Take something like this, where the keys of an object literal are CSS selectors, and the values may be objects, arrays, or strings for interpolation or otherwise:
 
-	{ 'div.some-class-1': {
+	var template = { 'div.some-class-1': {
 			'ul.my-list[data-attr="custom"]': [
 				{
-					li: '{{foo}}'
+					li: 'Favorite Show: ~~foo~~'
 				},
 				{
-					li: '{{bar}}'
+					li: 'Other Favorite Show: ~~bar~~'
 				}
 			]
 		}
 	}
 
-Turn it into an HTML template we could hand to something like Handlebars or Underscore:
+Turn it into an HTML template we could hand to something like Underscore, assuming that double tildes mark variable interpolation:
 
+	var string = nerve.render( template );
+
+	// string outputs: '<div class="some-class-1"><ul class="my-list" data-attr="custom"><li>~~foo~~</li><li>~~bar~~</li></div>'
+
+	// using underscore's _.template
+	var render = _.template( string );
+	var html = render({
+		foo: 'Bob\'s Burgers',
+		bar: 'Archer'
+	});
+
+	// our stringified html:
 	<div class="some-class-1">
-		<ul class="my-list" data-attr="custom">
-			<li>{{foo}}</li>
-			<li>{{bar}}</li>
-		</ul>
+	    <ul class="my-list" data-attr="custom">
+	        <li>Bob's Burgers</li>
+	        <li>Archer</li>
+	    </ul>
 	</div>
 
 # Why?
 
-Writing templates as normal Javascript lets us embed them in Components or Views without string concatenation or importing them as HTML files.
+Writing templates as Javascript lets us embed them in Components or Views without string concatenation or importing them as HTML files.
 
 HTML syntax (XML) isn't fun to write by hand (/opinion).
 
-CSS selectors represent DOM elements well in a terse syntax that is expressive and well understood.
+CSS selectors represent DOM elements well in a terse syntax that is expressive and well understood by many developers and designers. JSON easily models the nested hierarchy of HTML/XML.
 
-JSON models nested hierarchies well, like XML/HTML.
+Expressing templates as Javascript opens up other possibilities:
+• APIs for templates.  Mutate the template without touching the DOM.
+• Server side rendering.
+• No transpiling.
+• Swap in parsing modules for things that aren't HTML.
 
 For science, and fun.
 
@@ -56,10 +72,29 @@ We can get around the characters in CSS selectors that we can't write in the key
 
 	// <div id="someId">fubar</div>
 
-# Current Status
-As of 12/28/15 the stringify module can be implemented as such:
+We can't use the same key twice in an object literal. In an object like this, only the last key gets saved:
 
-	stringify.normalized( normalize( testStructure ) );
+	c = {
+		li: 'foo',
+		li: 'wat',
+		li: 'bar'
+	}
+
+	// c.li outputs 'bar', the last key overrules any duplicates
+
+We can use arrays to get around this if we need multiple elements with the same selector.
+
+	c = [
+		{ li: 'foo' },
+		{ li: 'bar' }
+	]
+
+	// "<li>foo</li><li>bar</li>"
+
+# Current Status
+12/31/15: the modules as loaded in SpecRunner.html can be implemented as such:
+
+	nerve.render( testStructure );
 
 A test structure as complex as this:
 
@@ -110,8 +145,7 @@ Will yield:
 	    </div>
 	</div>
 
-## Todos
-### Inline Scripting
+## Inline Scripting
 
 Templates need logic. What if we use functions to embed logic in our templates?
 
@@ -131,7 +165,7 @@ Assuming a templating syntax like ~~ interpolate ~~ and << evaluate >>
 		}
 	}
 
-Should yield:
+Yields:
 
 	<div class="foo">
 		<<if(message){>>
@@ -147,18 +181,79 @@ Given an Underscore-like templating function and data object:
 		message: 'moe'
 	})
 
-Should yield:
+Yields:
 
 	<div class="foo">
 		<span>moe</span>
 	</div>
 
-The current stringify module is capable of rendering simple functions like this with return blocks nested in control structures.
-The functions are parsed as strings, and are never really executed. They are just containers for logic that will be inlined later.
+The functions are parsed as strings. They don't take arguments and are never executed. They are just containers for logic that will be inlined later. Return blocks are delimiters for where the template should begin reading the enclosed object as HTML again. At the moment, only objects can be returned in functions.
 
-### Modularize
+We should be able to recursively render as many nested structures as we want.
 
-Isolate functions better. Correctly insert nested logic for inline scripting. Dealing with edge cases. Testability.
+## API
+SpecRunner.html includes an example of the modules being loaded in a simple html file independently. Distributed script files are coming soonish.
+
+This documentation is not exhaustive, but covers the important parts of the project.
+
+### Core
+#### nerve.render( templateStruct )
+
+	var templateStruct = { div: 'blah' }
+
+	// <div>blah</div>
+
+Render is a shorthand method for normalizing and stringifying a template structure. It's equivalent to:
+	
+	nerve.stringify.normalized( nerve.normalize( templateStruct ) );
+
+#### nerve.normalize( templateStruct )
+
+Parse a nested structure and return a more accessible version of itself that we can manipulate or stringify.
+
+	var templateStruct = {
+		'div#hashTag.wow.much-css[data-has="aValue"]': 'something neat'
+	}
+
+	// outputs:
+	[
+		{
+			attrs: [
+				{ attrKey: 'data-has' },
+				{ attrVal: 'aValue' }
+			],
+			classes: [
+				'wow', 'much-css'
+			],
+			id: 'hashTag',
+			inner: 'something neat',
+			tagName: 'div',
+			type: 'html'
+		}
+	]
+
+Nested structures are recursively placed in the inner property, which is either an array or a string. The custom 'type' property is used for better type checking. In another library could we could use it to detect nested components.
+
+#### nerve.stringify 
+
+Container for stringification methods. 
+
+##### nerve.stringify.normalized( normalizedStruct )
+
+Takes a normalized structure (see above) and outputs the html equivalent. It relies on the rest of the stringification module, and is the main entrance point for stringifying a nested object.
+
+#### nerve.parse, nerve.parse.css, nerve.parse.functions
+
+Containers for parsing CSS selectors and anonymous functions. They are submodules that are used by the higher functions for parsing keys and values as we traverse the template structure.
+
+## Todos
+Isolate and modularize functions.
+Testability. Eliminating edge cases.
+Parsing configuration / alternate syntaxes.
+Packages / minified script files.
+Accessing properties of a component ala JSX: this.props.someProp
+
+Should be able to nest components within templates and have them render their templates in context. We're working on a refactored branch of Ulna to achieve this.
 
 # License
 
