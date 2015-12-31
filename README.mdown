@@ -1,5 +1,5 @@
 # Nerve
-Write HTML templates as Javascript data structures. Use CSS keys to describe DOM elements in a hierarchical style like JSON.
+Write HTML templates as Javascript data structures. Use CSS selectors to describe DOM elements in a hierarchical style like JSON.
 
 WIP Warning: Nerve is a work in progress. Use at your own risk.
 
@@ -187,14 +187,12 @@ Yields:
 		<span>moe</span>
 	</div>
 
-The functions are parsed as strings. They don't take arguments and are never executed. They are just containers for logic that will be inlined later. Return blocks are delimiters for where the template should begin reading the enclosed object as HTML again. At the moment, only objects can be returned in functions.
+The functions are parsed as strings. They don't take arguments and are never executed. They are just containers for logic that will be inlined later. Return blocks are delimiters for where the parser should begin reading the enclosed object as HTML again. At the moment, only objects can be returned in functions.
 
 We should be able to recursively render as many nested structures as we want.
 
 ## API
 SpecRunner.html includes an example of the modules being loaded in a simple html file independently. Distributed script files are coming soonish.
-
-This documentation is not exhaustive, but covers the important parts of the project.
 
 ### Core
 #### nerve.render( templateStruct )
