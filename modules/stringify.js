@@ -81,13 +81,23 @@ var stringify = (function() {
 
 			// custom attrs
 			if (obj.hasOwnProperty('attrs') && obj.attrs.length) {
+				
 				// loop through array of key/vals
 				for (var a = 0; obj.attrs.length > a; a++) {
 					var attr = obj.attrs[a];
 
-					for (var attrKey in attr) {
-						string += ' '
+					// for each pair, concatenate them as a single string
+					var pair = []
+
+					for (var key in attr) {
+						pair.push(attr[key])
 					}
+
+					pair[1] = '"' + pair[1] + '"';
+					pair = pair.join('=');
+
+					// we add to the string each time in the loop, accounting for each attr in the array
+					string += ' ' + pair;
 				}
 			}
 
