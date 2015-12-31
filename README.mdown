@@ -23,7 +23,7 @@ Turn it into an HTML template we could hand to something like Underscore, assumi
 
 	var string = nerve.render( template );
 
-	// string outputs: '<div class="some-class-1"><ul class="my-list" data-attr="custom"><li>~~foo~~</li><li>~~bar~~</li></div>'
+	// string outputs: '<div class="some-class-1"><ul class="my-list" data-attr="custom"><li>Favorite Show: ~~foo~~</li><li>Other Favorite Show: ~~bar~~</li></div>'
 
 	// using underscore's _.template
 	var render = _.template( string );
@@ -35,8 +35,8 @@ Turn it into an HTML template we could hand to something like Underscore, assumi
 	// our stringified html:
 	<div class="some-class-1">
 	    <ul class="my-list" data-attr="custom">
-	        <li>Bob's Burgers</li>
-	        <li>Archer</li>
+	        <li>Favorite Show: Bob's Burgers</li>
+	        <li>Other Favorite SHow: Archer</li>
 	    </ul>
 	</div>
 

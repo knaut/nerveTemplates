@@ -28,6 +28,15 @@
 	<script type="text/javascript" src="tests/toType_spec.js"></script>
 	<script type="text/javascript" src="tests/parseCSSKey_spec.js"></script>
 	<!-- <script type="text/javascript" src="tests/normalize_spec.js"></script> -->
+
+	<script>
+		// set underscore to recognize nerve syntax
+		_.templateSettings = {
+			evaluate: /\<\<([\s\S]+?)\>\>/g, 
+			interpolate: /\~\~([\s\S]+?)\~\~/g, 
+			escape: /\-\-([\s\S]+?)\-\-/g
+		}
+	</script>
 	
 <body>
 	<h1>Test until it gets on your nerves.</h1>
