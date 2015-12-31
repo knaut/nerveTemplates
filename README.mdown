@@ -49,10 +49,10 @@ HTML syntax (XML) isn't fun to write by hand (/opinion).
 CSS selectors represent DOM elements well in a terse syntax that is expressive and well understood by many developers and designers. JSON easily models the nested hierarchy of HTML/XML.
 
 Expressing templates as Javascript opens up other possibilities:
-• APIs for templates.  Mutate the template without touching the DOM.
-• Server side rendering.
-• No transpiling.
-• Swap in parsing modules for things that aren't HTML.
+* APIs for templates.  Mutate the template without touching the DOM.
+* Server side rendering.
+* No transpiling.
+* Swap in parsing modules for things that aren't HTML.
 
 For science, and fun.
 
