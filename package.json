@@ -1,0 +1,27 @@
+{
+  "name": "nerve",
+  "version": "0.0.1",
+  "description": "writing HTML templates as Javascript data structures",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/knaut/nerve.git"
+  },
+  "keywords": [
+    "template",
+    "html",
+    "javascript"
+  ],
+  "author": "daniel anderson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/knaut/nerve/issues"
+  },
+  "homepage": "https://github.com/knaut/nerve#readme"
+}
