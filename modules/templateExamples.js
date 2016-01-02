@@ -1,5 +1,30 @@
 var testTemplates = (function() {
 
+	
+	// rootTempl1 = {
+	// 	h2: 'Click Me',
+	// 	div: function() {
+	// 		if (number) {
+	// 			return {
+	// 				'#amazing': {
+	// 					'#blah': example
+	// 				}
+	// 			}	
+	// 		} else {
+	// 			return {
+	// 				'span': 'counter is at zero'
+	// 			}
+	// 		}			
+	// 	}		
+	// }
+
+
+	// rootTempl2 = {
+	// 	h2: 'Click Me',
+	// 	'#child-1': example
+	// }
+
+
 	testFunc2 = {
 		h2: 'Click Me',
 		div: function() {
