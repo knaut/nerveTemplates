@@ -1,4 +1,4 @@
-var parseCSSKey = (function() {
+var parseCSSKey = function( nerve ) {
 
 	return {
 		selector: function(string) {
@@ -153,4 +153,4 @@ var parseCSSKey = (function() {
 			return parsed;
 		}
 	}
-})();
+};

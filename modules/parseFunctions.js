@@ -1,5 +1,5 @@
-var functionParser = (function() {
-	
+var functionParser = function( nerve ) {
+
 	return {
 		normalize: function( func ) {
 			var rgfuncHead = /^function\s*[(][)]\s*[{]\s*/;	// eg 'function() { …'
@@ -34,14 +34,10 @@ var functionParser = (function() {
 				// we re-use the src to extrapolate where the returned blocks should go
 				var trimmedSrcBody = srcBody[i].replace(/\s/g, '');
 				
-				// console.log('trimmedSrcBody', trimmedSrcBody);
-
 				slicedReturnBlocks.push( this.sliceReturnBlock( trimmedSrcBody ) );
 				parsedReturnBlocks.push( this.parseReturnBlock( trimmedSrcBody ) );
 			}
 
-			// console.log(slicedReturnBlocks)
-			// console.log(parsedReturnBlocks)
 
 			// normalized return blocks are inner properties of code blocks
 			var script = func.toString();
@@ -60,8 +56,6 @@ var functionParser = (function() {
 				src: script,
 				inner: normalizedReturnBlocks
 			}
-
-			console.log(parsedFunc)
 
 			return parsedFunc;
 		},
@@ -112,7 +106,6 @@ var functionParser = (function() {
 						break;
 					}	
 				}
-				
 			}
 			
 			var slicedString = string.slice(0, sliceLength);
@@ -131,16 +124,13 @@ var functionParser = (function() {
 			for (var p = 0; props.length > p; p++) {
 
 				var pair = props[p].split(':');
-				console.log(props[p], pair)
 
 				pair[1] = pair[1].replace(/'*/g, "");
 
 				obj[pair[0]] = pair[1];
 			}
 
-			// console.log(obj)
-
 			return obj;
 		}
 	}
-})();
+};

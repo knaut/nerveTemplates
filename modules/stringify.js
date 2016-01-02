@@ -1,4 +1,4 @@
-var stringify = (function() {
+var stringify = function( nerve ) {
 
 	return {
 		normalized: function(normalized) {
@@ -11,7 +11,7 @@ var stringify = (function() {
 
 				switch (normalizedType) {
 					case 'object':
-						string += stringify.object(normalized[n]);
+						string += this.object(normalized[n]);
 						
 					break;
 					case 'string':
@@ -29,10 +29,10 @@ var stringify = (function() {
 			var string = '';
 			switch (obj.type) {
 				case 'html':
-					string = stringify.html(obj);
+					string = this.html(obj);
 				break;
 				case 'function':
-					string = stringify.func(obj);
+					string = this.func(obj);
 				break;
 			}
 			return string;
@@ -58,7 +58,7 @@ var stringify = (function() {
 
 				// we don't use stringify() here because that will cause unnecessary nested loops
 				// we also know its type, so we can stringify it directly
-				string += stringify.html(obj.inner[s]);
+				string += this.html(obj.inner[s]);
 			}
 			// we can assume there will be an ending bracket in most control structures
 			string += delimiters.evaluate[0] + splitSrc[s] + delimiters.evaluate[1];
@@ -105,7 +105,7 @@ var stringify = (function() {
 			string += '>';
 
 			if (obj.hasOwnProperty('inner') && obj.inner.length && toType(obj.inner) !== 'string') {
-				string += stringify.normalized(obj.inner);
+				string += this.normalized(obj.inner);
 			} else if (toType(obj.inner) === 'string') {
 				string += obj.inner;
 			}
@@ -115,4 +115,4 @@ var stringify = (function() {
 			return string;
 		}
 	}
-})();
+};

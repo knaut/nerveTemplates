@@ -1,14 +1,14 @@
-var nerve = (function() {
+var Nerve = function( component ) {
+	this.component = component;
 
-	var core = {
-		parse: parse,
-		stringify: stringify,
-		normalize: normalize,
-		render: function( template ) {		
-			return this.stringify.normalized( this.normalize( template ) );
-		}
+	this.parse = {
+		functions: functionParser( this ),
+		css: parseCSSKey( this )
 	}
 
-	return core;
-	
-})();
+	this.stringify = stringify( this );
+
+	this.normalize = normalize( this );
+
+	this.toType = toType;
+}
