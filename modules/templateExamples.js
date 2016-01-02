@@ -1,5 +1,52 @@
 var testTemplates = (function() {
 
+	testFunc2 = {
+		h2: 'Click Me',
+		div: function() {
+			if (number) {
+				return {
+					'#amazing[data-val="test"]': 'example'
+				}	
+			} else {
+				return {
+					'span': 'counter is at zero'
+				}
+			}
+		}
+	}
+
+	testFunc1 = {
+		h2: 'Click Me',
+		div: function() {
+			if (number) {
+				return {
+					'#amazing': 'example'
+				}	
+			} else {
+				return {
+					'span': 'counter is at zero'
+				}
+			}
+		}
+	}
+
+	testFunc3 = {
+		h2: 'Click Me',
+		div: function() {
+			if (number) {
+				return {
+					'#amazing': {
+						'#example': 'just an example'
+					}
+				}	
+			} else {
+				return {
+					'span': 'counter is at zero'
+				}
+			}
+		}
+	}
+
 	// normalize an object into an array
 	template = {
 		'#root': {

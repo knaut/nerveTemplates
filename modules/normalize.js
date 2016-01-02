@@ -1,4 +1,4 @@
-var normalize = function( struct ) {
+var normalize = function( struct, children ) {
 	// take a nerve template of static css selectors
 	// and normalize it as a nested structure
 	/*
@@ -31,7 +31,6 @@ var normalize = function( struct ) {
 	]
 	*/
 	var normalized = [];
-	var children = [];
 
 	switch( toType(struct) ) {
 		case 'string':
@@ -43,8 +42,8 @@ var normalize = function( struct ) {
 				var obj = struct[i];
 
 				for (var key in obj) {
-					var parsed = parse.css.selector( key );
-					parsed.inner = normalize( obj[key] );
+					var parsed = nerve.parse.css.selector( key );
+					parsed.inner = nerve.normalize( obj[key] );
 				}
 
 				normalized.push( parsed )
@@ -61,25 +60,32 @@ var normalize = function( struct ) {
 				obj[key] = val;
 
 				for (var keyS in obj) {
-					var parsed = parse.css.selector( keyS );
-					parsed.inner = normalize( struct[keyS] );
+					var parsed = nerve.parse.css.selector( keyS );
+					parsed.inner = nerve.normalize( struct[keyS] );
 				}
 
 				normalized.push(parsed);
 			}
 		break;
 		case 'function':
-			normalized.push( parse.functions.normalize( struct ) );
+			normalized.push( nerve.parse.functions.normalize( struct ) );
 		break;
 		case 'component':
 			console.log('found component!', struct);
+
+			struct['parent'] = this;
+
+			if (children !== undefined) {
+				children.push( struct );	
+			}
+			
 			// this would dump the rendered template of the nested component into the next one
 			// normalized = normalize( struct.template );
 			// var normalStruct = normalize( struct.template );
 
-			console.log(this)
+			// console.log(this)
 
-			this.children.push( struct );
+			// this.children.push( struct );
 
 		break;
 	}
