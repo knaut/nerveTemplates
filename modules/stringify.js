@@ -116,3 +116,5 @@ var stringify = function( nerve ) {
 		}
 	}
 };
+
+module.exports = stringify;

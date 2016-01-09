@@ -1,4 +1,4 @@
-var functionParser = function( nerve ) {
+var parseFunctions = function( nerve ) {
 
 	return {
 		normalize: function( func ) {
@@ -32,8 +32,10 @@ var functionParser = function( nerve ) {
 				normalizedReturnBlocks.push( this.sanitizeSrcBody(srcBody[i]) );
 
 				// we re-use the src to extrapolate where the returned blocks should go
-				var trimmedSrcBody = srcBody[i].replace(/\s/g, '');
-				
+				// console.log(srcBody[i]);
+				var trimmedSrcBody = srcBody[i].replace(/\t|\s{2,}|\n/g, ' ');
+				// console.log(trimmedSrcBody)
+
 				slicedReturnBlocks.push( this.sliceReturnBlock( trimmedSrcBody ) );
 				parsedReturnBlocks.push( this.parseReturnBlock( trimmedSrcBody ) );
 			}
@@ -43,7 +45,8 @@ var functionParser = function( nerve ) {
 			var script = func.toString();
 
 			// lose the whitespace
-			script = script.replace(/\s/g, "");
+			// console.log(script)
+			script = script.replace(/\t|\s{2,}|\n/g, ' ');
 			script = script.split( rgfuncHead )[1];
 			script = script.split( rgfuncTail )[0];
 
@@ -98,7 +101,6 @@ var functionParser = function( nerve ) {
 				}
 				if (string[i] === '}') {
 					exitBracesInt++;
-
 				}
 				if (i !== 0) {
 					if (enterBracesInt === exitBracesInt) {
@@ -109,6 +111,7 @@ var functionParser = function( nerve ) {
 			}
 			
 			var slicedString = string.slice(0, sliceLength);
+			// console.log(slicedString)
 			return slicedString;
 		},
 
@@ -130,7 +133,10 @@ var functionParser = function( nerve ) {
 				obj[pair[0]] = pair[1];
 			}
 
+			// console.log(obj)
 			return obj;
 		}
 	}
 };
+
+module.exports = parseFunctions;

@@ -1,5 +1,5 @@
 {
-  "name": "nerve",
+  "name": "nerve-templates",
   "version": "0.0.1",
   "description": "writing HTML templates as Javascript data structures",
   "main": "index.js",
@@ -18,7 +18,7 @@
     "html",
     "javascript"
   ],
-  "author": "daniel anderson",
+  "author": "daniel anderson <info@knaut.net>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/knaut/nerve/issues"

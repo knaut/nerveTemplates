@@ -35,7 +35,7 @@ var normalize = function( nerve ) {
 
 		var normalized = [];
 
-		switch( toType(struct) ) {
+		switch( this.toType(struct) ) {
 			case 'string':
 				return struct;
 			break;
@@ -74,24 +74,10 @@ var normalize = function( nerve ) {
 				normalized.push( nerve.parse.functions.normalize( struct ) );
 			break;
 			case 'component':
-				console.log('found component!', struct);
 
 				struct['parent'] = nerve.component;
 
 				nerve.component.children.push( struct );
-
-				// if (children !== undefined) {
-				// 	children.push( struct );	
-				// }
-				
-				// this would dump the rendered template of the nested component into the next one
-				// normalized = normalize( struct.template );
-				// var normalStruct = normalize( struct.template );
-
-				// console.log(this)
-
-				
-
 			break;
 		}
 
@@ -99,3 +85,5 @@ var normalize = function( nerve ) {
 
 	}
 }
+
+module.exports = normalize;

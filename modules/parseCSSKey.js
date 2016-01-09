@@ -154,3 +154,5 @@ var parseCSSKey = function( nerve ) {
 		}
 	}
 };
+
+module.exports = parseCSSKey

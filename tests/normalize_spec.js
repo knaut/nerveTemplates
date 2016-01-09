@@ -1,8 +1,8 @@
-var normalized = normalize(template)
+var nerve = new Nerve();
 
 describe('normalized', function() {
 	it('should be an array', function() {
-		expect( toType( normalized ) ).toEqual('array');
+		expect( nerve.toType( normalized ) ).toEqual('array');
 	});
 
 	// only single root supported atm
@@ -16,8 +16,8 @@ describe('normalized', function() {
 		console.log( normalized)
 		var isStringOrArray = false;
 		for (var n = 0; normalized.length > n; n++) {
-			console.log( toType(normalized[n].inner))
-			if ( toType( normalized[n].inner ) === 'string' || toType( normalized[n].inner ) === 'array' ) {
+			console.log( nerve.toType(normalized[n].inner))
+			if ( nerve.toType( normalized[n].inner ) === 'string' || nerve.toType( normalized[n].inner ) === 'array' ) {
 				
 				isStringOrArray = true;
 				console.log(isStringOrArray)

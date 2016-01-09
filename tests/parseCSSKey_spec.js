@@ -10,13 +10,15 @@ var testSelectors = [
 
 var testSelector = function( selector ) {
 	
-	var parsed = parse.css.selector( selector );
+	var nerve = new Nerve();
 
-	describe('parse.css.selector(' + selector + ')', function() {
+	var parsed = nerve.parse.css.selector( selector );
+
+	describe('parsing "' + selector + '" ', function() {
 
 		it('should return an object from a CSS selector string', function() {
 
-			expect(toType(parsed)).toEqual('object');
+			expect(nerve.toType(parsed)).toEqual('object');
 
 		});
 
@@ -45,9 +47,9 @@ var testSelector = function( selector ) {
 			it('should be string or null', function() {
 				// testing with brute force
 				// doing this until custom matchers work
-				if ( toType(parsed.id) === 'string' ) {
+				if ( nerve.toType(parsed.id) === 'string' ) {
 					expect( true ).toBe( true );
-				} else if ( toType(parsed.id) === 'null' ) {
+				} else if ( nerve.toType(parsed.id) === 'null' ) {
 					expect( true ).toBe( true );
 				} else {
 					// force a fail
@@ -99,7 +101,7 @@ var testSelector = function( selector ) {
 
 		describe('key of classes', function() {
 			it('should be an array', function() {
-				expect( toType( parsed.classes ) ).toBe('array');
+				expect( nerve.toType( parsed.classes ) ).toBe('array');
 			});
 
 			if ( parsed.classes.length ) {
@@ -107,7 +109,7 @@ var testSelector = function( selector ) {
 
 					var needle = true;
 					for (var c = 0; parsed.classes.length > c; c++) {
-						if ( toType( parsed.classes[c] ) !== 'string' ) {
+						if ( nerve.toType( parsed.classes[c] ) !== 'string' ) {
 							needle = false;
 						}
 					}
@@ -119,7 +121,7 @@ var testSelector = function( selector ) {
 
 		describe('key of attrs', function() {
 			it('should be an array', function() {
-				expect( toType( parsed.attrs ) ).toBe('array');
+				expect( nerve.toType( parsed.attrs ) ).toBe('array');
 			});
 
 			if ( parsed.attrs.length ) {
@@ -127,7 +129,7 @@ var testSelector = function( selector ) {
 
 					var needle = true;
 					for (var c = 0; parsed.classes.length > c; c++) {
-						if ( toType( parsed.classes[c] ) !== 'object' ) {
+						if ( nerve.toType( parsed.classes[c] ) !== 'object' ) {
 							needle = false;
 						}
 					}
@@ -140,9 +142,9 @@ var testSelector = function( selector ) {
 	
 }
 
-
 // to test all example selectors
 for (var v = 0; testSelectors.length > v; v++) {
+	console.log(testSelectors[v])
 	testSelector( testSelectors[v] );
 }
 

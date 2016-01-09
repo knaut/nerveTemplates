@@ -1,21 +1,23 @@
 describe( 'toType', function() {
 
+	var nerve = new Nerve();
+
 	it( 'should return a string of the object\'s type', function() {
 
 		// array
-		expect( toType( [] ) ).toEqual('array');
+		expect( nerve.toType( [] ) ).toEqual('array');
 
 		// object
-		expect( toType( {} ) ).toEqual('object');
+		expect( nerve.toType( {} ) ).toEqual('object');
 
 		// function
-		expect( toType( function(){} ) ).toEqual('function');
+		expect( nerve.toType( function(){} ) ).toEqual('function');
 
 		// number
-		expect( toType( 0 ) ).toEqual('number');
+		expect( nerve.toType( 0 ) ).toEqual('number');
 
 		// string
-		expect( toType( 'test' ) ).toEqual('string');
+		expect( nerve.toType( 'test' ) ).toEqual('string');
 	});
 
 });
