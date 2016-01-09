@@ -17,22 +17,8 @@ var testFuncs = [
 var nerve = new Nerve();
 
 var testFunc = function( test ) {
-	console.log(test);
 
 	var parsed = nerve.parse.functions.normalize( test );
-	console.log(parsed)
-
-		// it('should return an object with keys inner, src, type', function() {
-		// 	console.log(parsed)
-
-		// 	expect( nerve.toType( parsed ) ).toEqual('object')
-		// 	expect( nerve.toType( parsed.inner ) ).toEqual('array');
-		// 	expect( nerve.toType( parsed.src ) ).toEqual('string');
-		// 	expect( parsed.type ).toEqual('function');
-
-		// });
-
-		
 
 }
 
