@@ -1,0 +1,93 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'publish' ]
+2 info using npm@3.3.12
+3 info using node@v5.2.0
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: '/Users/daniel/Dropbox-knaut/Dropbox/NewDesktop/Code/code/nerveTemplates',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory /Users/daniel/.npm/nerve-templates/0.0.2/package.tgz not in flight; packing
+9 info lifecycle nerve-templates@0.0.2~prepublish: nerve-templates@0.0.2
+10 silly lifecycle nerve-templates@0.0.2~prepublish: no script for prepublish, continuing
+11 verbose tar pack [ '/Users/daniel/.npm/nerve-templates/0.0.2/package.tgz',
+11 verbose tar pack   '/Users/daniel/Dropbox-knaut/Dropbox/NewDesktop/Code/code/nerveTemplates' ]
+12 verbose tarball /Users/daniel/.npm/nerve-templates/0.0.2/package.tgz
+13 verbose folder /Users/daniel/Dropbox-knaut/Dropbox/NewDesktop/Code/code/nerveTemplates
+14 verbose addLocalTarball adding from inside cache /Users/daniel/.npm/nerve-templates/0.0.2/package.tgz
+15 silly cache afterAdd nerve-templates@0.0.2
+16 verbose afterAdd /Users/daniel/.npm/nerve-templates/0.0.2/package/package.json not in flight; writing
+17 verbose afterAdd /Users/daniel/.npm/nerve-templates/0.0.2/package/package.json written
+18 silly publish { name: 'nerve-templates',
+18 silly publish   version: '0.0.2',
+18 silly publish   description: 'writing HTML templates as Javascript data structures',
+18 silly publish   main: 'index.js',
+18 silly publish   directories: { test: 'tests' },
+18 silly publish   scripts: { test: 'echo "Error: no test specified" && exit 1' },
+18 silly publish   repository: { type: 'git', url: 'git+https://github.com/knaut/nerve.git' },
+18 silly publish   keywords: [ 'template', 'html', 'javascript' ],
+18 silly publish   author: { name: 'daniel anderson', email: 'info@knaut.net' },
+18 silly publish   license: 'MIT',
+18 silly publish   bugs: { url: 'https://github.com/knaut/nerve/issues' },
+18 silly publish   homepage: 'https://github.com/knaut/nerve#readme',
+18 silly publish   readme: '# Nerve\nWrite HTML templates as Javascript data structures. Use CSS selectors to describe DOM elements in a hierarchical style like JSON.\n\nWIP Warning: Nerve is a work in progress. Use at your own risk.\n\n# The Nutshell\n\nTake something like this, where the keys of an object literal are CSS selectors, and the values may be objects, arrays, or strings for interpolation or otherwise:\n\n\tvar template = { \'div.some-class-1\': {\n\t\t\t\'ul.my-list[data-attr="custom"]\': [\n\t\t\t\t{\n\t\t\t\t\tli: \'Favorite Show: ~~foo~~\'\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tli: \'Other Favorite Show: ~~bar~~\'\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t}\n\nTurn it into an HTML template we could hand to something like Underscore, assuming that double tildes mark variable interpolation:\n\n\tvar string = nerve.render( template );\n\n\t// string outputs: \'<div class="some-class-1"><ul class="my-list" data-attr="custom"><li>Favorite Show: ~~foo~~</li><li>Other Favorite Show: ~~bar~~</li></div>\'\n\n\t// using underscore\'s _.template\n\tvar render = _.template( string );\n\tvar html = render({\n\t\tfoo: \'Bob\\\'s Burgers\',\n\t\tbar: \'Archer\'\n\t});\n\n\t// our stringified html:\n\t<div class="some-class-1">\n\t    <ul class="my-list" data-attr="custom">\n\t        <li>Favorite Show: Bob\'s Burgers</li>\n\t        <li>Other Favorite SHow: Archer</li>\n\t    </ul>\n\t</div>\n\n# Why?\n\nWriting templates as Javascript lets us embed them in Components or Views without string concatenation or importing them as HTML files.\n\nHTML syntax (XML) isn\'t fun to write by hand (/opinion).\n\nCSS selectors represent DOM elements well in a terse syntax that is expressive and well understood by many developers and designers. JSON easily models the nested hierarchy of HTML/XML.\n\nExpressing templates as Javascript opens up other possibilities:\n* APIs for templates.  Mutate the template without touching the DOM.\n* Server side rendering.\n* No transpiling.\n* Swap in parsing modules for things that aren\'t HTML.\n\nFor science, and fun.\n\n# The Pain\n\n\t{\n\t\tdiv#someId: \'fubar\'\n\t}\n\n\t// Syntax Error!\n\nWe can get around the characters in CSS selectors that we can\'t write in the keys of an object literal by wrapping them in quotes, explicitly stating that the key is a string.\n\n\t{\n\t\t\'div#someId\': \'fubar\'\n\t}\n\n\t// <div id="someId">fubar</div>\n\nWe can\'t use the same key twice in an object literal. In an object like this, only the last key gets saved:\n\n\tc = {\n\t\tli: \'foo\',\n\t\tli: \'wat\',\n\t\tli: \'bar\'\n\t}\n\n\t// c.li outputs \'bar\', the last key overrules any duplicates\n\nWe can use arrays to get around this if we need multiple elements with the same selector.\n\n\tc = [\n\t\t{ li: \'foo\' },\n\t\t{ li: \'bar\' }\n\t]\n\n\t// "<li>foo</li><li>bar</li>"\n\n# Current Status\n12/31/15: the modules as loaded in SpecRunner.html can be implemented as such:\n\n\tnerve.render( testStructure );\n\nA test structure as complex as this:\n\n\ttestStructure = [{\n\t\t\'#a.foo[data-val=1][data-val="a"]\': {\n\t\t\t\'#b.bar[data-val=2]\': {\n\t\t\t\t\'#c.baz.banksy[data-val=3]\': \'hello World!\'\n\t\t\t},\n\n\t\t\t\'#d.bar[data-val=4]\': {\n\t\t\t\t\'#e.baz.banksy[data-val=5]\': [{\n\t\t\t\t\t\t\'div\': \'blah\'\n\t\t\t\t\t}, {\n\t\t\t\t\t\t\'div\': \'blah\'\n\t\t\t\t\t}, {\n\t\t\t\t\t\t\'div\': \'blah\'\n\t\t\t\t\t}, {\n\t\t\t\t\t\t\'span\': \'this is just a test template\'\n\t\t\t\t\t}, {\n\t\t\t\t\t\t\'div#amazing.my-other-class\': \'a series of nested elements…\'\n\t\t\t\t\t}, {\n\t\t\t\t\t\t\'nav\': {\n\t\t\t\t\t\t\t\'span\': \'this is a nested child\'\n\t\t\t\t\t\t}\n\t\t\t\t\t}, {\n\t\t\t\t\t\t\'div\': \'blah\'\n\t\t\t\t\t}\n\t\t\t\t]\n\t\t\t}\n\t\t}\n\t}]\n\nWill yield:\n\n\t<div id="a" class="foo" data-val="1" data-val="a">\n\t    <div id="b" class="bar" data-val="2">\n\t        <div id="c" class="baz banksy" data-val="3">hello World!</div>\n\t    </div>\n\t    <div id="d" class="bar" data-val="4">\n\t        <div id="e" class="baz banksy" data-val="5">\n\t            <div>blah</div>\n\t            <div>blah</div>\n\t            <div>blah</div><span>this is just a test template</span>\n\t            <div id="amazing" class="my-other-class">a series of nested elements…</div>\n\t            <nav><span>this is a nested child</span></nav>\n\t            <div>blah</div>\n\t        </div>\n\t    </div>\n\t</div>\n\n## Inline Scripting\n\nTemplates need logic. What if we use functions to embed logic in our templates?\n\nAssuming a templating syntax like ~~ interpolate ~~ and << evaluate >>\n\t\n\ttemplate = {\n\t\t\'div.blah\': function() {\n\t\t\tif (message) {\n\t\t\t\treturn {\n\t\t\t\t\tspan: \'~~message~~\'\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\treturn {\n\t\t\t\t\tspan: \'bob\'\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n\nYields:\n\n\t<div class="foo">\n\t\t<<if(message){>>\n\t\t\t<span>~~message~~</span>\n\t\t<<}else{>>\n\t\t\t<span>bar</span>\n\t\t<<}>>\n\t</div>\n\nGiven an Underscore-like templating function and data object:\n\n\trender({\n\t\tmessage: \'moe\'\n\t})\n\nYields:\n\n\t<div class="foo">\n\t\t<span>moe</span>\n\t</div>\n\nThe functions are parsed as strings. They don\'t take arguments and are never executed. They are just containers for logic that will be inlined later. Return blocks are delimiters for where the parser should begin reading the enclosed object as HTML again. At the moment, only objects can be returned in functions.\n\nWe should be able to recursively render as many nested structures as we want.\n\n## API\nSpecRunner.html includes an example of the modules being loaded in a simple html file independently. Distributed script files are coming soonish.\n\n### Core\n#### nerve.render( templateStruct )\n\n\tvar templateStruct = { div: \'blah\' }\n\n\t// <div>blah</div>\n\nRender is a shorthand method for normalizing and stringifying a template structure. It\'s equivalent to:\n\t\n\tnerve.stringify.normalized( nerve.normalize( templateStruct ) );\n\n#### nerve.normalize( templateStruct )\n\nParse a nested structure and return a more accessible version of itself that we can manipulate or stringify.\n\n\tvar templateStruct = {\n\t\t\'div#hashTag.wow.much-css[data-has="aValue"]\': \'something neat\'\n\t}\n\n\t// outputs:\n\t[\n\t\t{\n\t\t\tattrs: [\n\t\t\t\t{ attrKey: \'data-has\' },\n\t\t\t\t{ attrVal: \'aValue\' }\n\t\t\t],\n\t\t\tclasses: [\n\t\t\t\t\'wow\', \'much-css\'\n\t\t\t],\n\t\t\tid: \'hashTag\',\n\t\t\tinner: \'something neat\',\n\t\t\ttagName: \'div\',\n\t\t\ttype: \'html\'\n\t\t}\n\t]\n\nNested structures are recursively placed in the inner property, which is either an array or a string. The custom \'type\' property is used for better type checking. In another library could we could use it to detect nested components.\n\n#### nerve.stringify \n\nContainer for stringification methods. \n\n##### nerve.stringify.normalized( normalizedStruct )\n\nTakes a normalized structure (see above) and outputs the html equivalent. It relies on the rest of the stringification module, and is the main entrance point for stringifying a nested object.\n\n#### nerve.parse, nerve.parse.css, nerve.parse.functions\n\nContainers for parsing CSS selectors and anonymous functions. They are submodules that are used by the higher functions for parsing keys and values as we traverse the template structure.\n\n## Todos\nIsolate and modularize functions.\nTestability. Eliminating edge cases.\nParsing configuration / alternate syntaxes.\nPackages / minified script files.\nAccessing properties of a component ala JSX: this.props.someProp\n\nShould be able to nest components within templates and have them render their templates in context. We\'re working on a refactored branch of Ulna to achieve this.\n\n# License\n\nMIT\n',
+18 silly publish   readmeFilename: 'README.mdown',
+18 silly publish   gitHead: '4109342811a2dacde56f273510fb2f13c3750587',
+18 silly publish   _id: 'nerve-templates@0.0.2',
+18 silly publish   _shasum: '6a64eb59d2235e569bd30d616cfb2c55f03238c2',
+18 silly publish   _from: '.' }
+19 verbose getPublishConfig undefined
+20 silly mapToRegistry name nerve-templates
+21 silly mapToRegistry using default registry
+22 silly mapToRegistry registry https://registry.npmjs.org/
+23 silly mapToRegistry uri https://registry.npmjs.org/nerve-templates
+24 verbose publish registryBase https://registry.npmjs.org/
+25 silly publish uploading /Users/daniel/.npm/nerve-templates/0.0.2/package.tgz
+26 verbose request uri https://registry.npmjs.org/nerve-templates
+27 verbose request sending authorization for write operation
+28 info attempt registry request try #1 at 1:11:42 AM
+29 verbose request using bearer token for auth
+30 verbose request id a8c9c2c7612abd70
+31 http request PUT https://registry.npmjs.org/nerve-templates
+32 http 403 https://registry.npmjs.org/nerve-templates
+33 verbose headers { 'content-type': 'application/json',
+33 verbose headers   'cache-control': 'max-age=300',
+33 verbose headers   'content-length': '95',
+33 verbose headers   'accept-ranges': 'bytes',
+33 verbose headers   date: 'Sat, 09 Jan 2016 09:11:43 GMT',
+33 verbose headers   via: '1.1 varnish',
+33 verbose headers   connection: 'keep-alive',
+33 verbose headers   'x-served-by': 'cache-lax1431-LAX',
+33 verbose headers   'x-cache': 'MISS',
+33 verbose headers   'x-cache-hits': '0',
+33 verbose headers   'x-timer': 'S1452330703.524454,VS0,VE176' }
+34 verbose request invalidating /Users/daniel/.npm/registry.npmjs.org/nerve-templates on PUT
+35 error publish Failed PUT 403
+36 verbose stack Error: "You cannot publish over the previously published version 0.0.2." : nerve-templates
+36 verbose stack     at makeError (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:264:12)
+36 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:252:14)
+36 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:172:14)
+36 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:198:22)
+36 verbose stack     at emitTwo (events.js:88:13)
+36 verbose stack     at Request.emit (events.js:173:7)
+36 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1082:10)
+36 verbose stack     at emitOne (events.js:83:20)
+36 verbose stack     at Request.emit (events.js:170:7)
+36 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1009:12)
+37 verbose statusCode 403
+38 verbose pkgid nerve-templates
+39 verbose cwd /Users/daniel/Dropbox-knaut/Dropbox/NewDesktop/Code/code/nerveTemplates
+40 error Darwin 13.4.0
+41 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "publish"
+42 error node v5.2.0
+43 error npm  v3.3.12
+44 error code E403
+45 error "You cannot publish over the previously published version 0.0.2." : nerve-templates
+46 error If you need help, you may report this error at:
+46 error     <https://github.com/npm/npm/issues>
+47 verbose exit [ 1, true ]

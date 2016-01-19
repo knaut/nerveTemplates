@@ -1,4 +1,18 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var nerve = require('./core.js');
+
+var Component = function( template ) {
+	this.type = 'component';
+	this.template = template;
+
+	this.nerve = new Nerve();
+}
+
+module.exports = Component;
+
+
+
+},{"./core.js":2}],2:[function(require,module,exports){
 var parseFunctions = require('./modules/parseFunctions.js');
 var parseCSSKey = require('./modules/parseCSSKey.js');
 var normalize = require('./modules/normalize');
@@ -24,8 +38,20 @@ if (typeof window !== "undefined") {
 	window.Nerve = Nerve;
 }
 
+var Component = require('./component.js');
+
+var testComponent = new Component({
+	span: 'blah'
+})
+
+window.testTemp = {
+	div: function() {
+		return testComponent;
+	}
+}
+
 exports.Nerve = Nerve;
-},{"./modules/normalize":2,"./modules/parseCSSKey.js":3,"./modules/parseFunctions.js":4,"./modules/stringify":5,"./modules/toType":6}],2:[function(require,module,exports){
+},{"./component.js":1,"./modules/normalize":3,"./modules/parseCSSKey.js":4,"./modules/parseFunctions.js":5,"./modules/stringify":6,"./modules/toType":7}],3:[function(require,module,exports){
 var normalize = function( nerve ) {
 	// take a nerve template of static css selectors
 	// and normalize it as a nested structure
@@ -115,7 +141,7 @@ var normalize = function( nerve ) {
 }
 
 module.exports = normalize;
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var parseCSSKey = function( nerve ) {
 
 	return {
@@ -274,7 +300,7 @@ var parseCSSKey = function( nerve ) {
 };
 
 module.exports = parseCSSKey
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var parseFunctions = function( nerve ) {
 
 	return {
@@ -309,9 +335,7 @@ var parseFunctions = function( nerve ) {
 				normalizedReturnBlocks.push( this.sanitizeSrcBody(srcBody[i]) );
 
 				// we re-use the src to extrapolate where the returned blocks should go
-				console.log(srcBody[i]);
 				var trimmedSrcBody = srcBody[i].replace(/\t|\s{2,}|\n/g, ' ');
-				console.log(trimmedSrcBody)
 
 				slicedReturnBlocks.push( this.sliceReturnBlock( trimmedSrcBody ) );
 				parsedReturnBlocks.push( this.parseReturnBlock( trimmedSrcBody ) );
@@ -322,7 +346,6 @@ var parseFunctions = function( nerve ) {
 			var script = func.toString();
 
 			// lose the whitespace
-			console.log(script)
 			script = script.replace(/\t|\s{2,}|\n/g, ' ');
 			script = script.split( rgfuncHead )[1];
 			script = script.split( rgfuncTail )[0];
@@ -388,7 +411,6 @@ var parseFunctions = function( nerve ) {
 			}
 			
 			var slicedString = string.slice(0, sliceLength);
-			// console.log(slicedString)
 			return slicedString;
 		},
 
@@ -410,14 +432,13 @@ var parseFunctions = function( nerve ) {
 				obj[pair[0]] = pair[1];
 			}
 
-			// console.log(obj)
 			return obj;
 		}
 	}
 };
 
 module.exports = parseFunctions;
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var stringify = function( nerve ) {
 
 	return {
@@ -539,7 +560,7 @@ var stringify = function( nerve ) {
 
 module.exports = stringify;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var toType = function(obj) {
 	// better type checking
 	// https://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/
@@ -551,4 +572,4 @@ var toType = function(obj) {
 }
 
 module.exports = toType;
-},{}]},{},[1]);
+},{}]},{},[2]);

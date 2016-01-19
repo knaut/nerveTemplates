@@ -23,4 +23,16 @@ if (typeof window !== "undefined") {
 	window.Nerve = Nerve;
 }
 
+var Component = require('./component.js');
+
+var testComponent = new Component({
+	span: 'blah'
+})
+
+window.testTemp = {
+	div: function() {
+		return testComponent;
+	}
+}
+
 exports.Nerve = Nerve;
