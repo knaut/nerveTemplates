@@ -14,13 +14,8 @@ Component = function(obj) {
 		this.children = []
 	}
 
-	if (!this['data']) {
-		this.data = {}
-	}
-
 	this.normalized = null;
 
-	// this.initialize();
 	this.initialize.apply(this, arguments);
 }
 
