@@ -1,5 +1,6 @@
 var _ = require('underscore');
 var extend = require('./extend.js');
+var nerve = require('./core.js');
 
 Component = function(obj) {
 	for (var prop in obj) {
