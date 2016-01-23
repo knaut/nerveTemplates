@@ -1,20 +1,76 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-nerve = {};
+Component = function(obj) {
+	for (var prop in obj) {
+		this[prop] = obj[prop];
+	}
 
-nerve.parse = {};
-nerve.parse.css = require('./modules/parse/css.js');
+	if (!this['type']) {
+		this.type = 'component'
+	}
 
-nerve.toType = function(obj) {
-	// better type checking
-	// https://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/
-	if (obj.hasOwnProperty('type') && obj.type === 'component') {
-		return 'component';
-	} else {
-		return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+	if (!this['children']) {
+		this.children = []
+	}
+
+	if (!this['data']) {
+		this.data = {}
 	}
 }
 
-nerve.normalize = function(struct) {
+Component.prototype = {}
+
+// we need to use the nerve object like a mixin
+// every component should have access to its library
+
+for (var prop in nerve) {
+	Component.prototype[prop] = nerve[prop];
+}
+
+module.exports = Component;
+},{}],2:[function(require,module,exports){
+nerve = {};
+nerve.parse = {};
+
+nerve.parse.css = require('./modules/parse/css.js');
+nerve.toType = require('./modules/toType.js')
+nerve.normalize = require('./modules/normalize.js');
+
+var Component = require('./component.js');
+
+var child1 = new Component({
+	template: {
+		'#someId': 'blah'
+	}
+});
+
+var child2 = new Component({
+	template: {
+		'#someOtherId': 'foo'
+	}
+});
+
+testComp = new Component({
+	data: true,
+
+	template: {
+		div: function() {
+			if (this.data) {
+				return child1
+			} else {
+				return child2
+			}
+		}
+	}
+});
+
+
+
+
+
+
+
+},{"./component.js":1,"./modules/normalize.js":3,"./modules/parse/css.js":4,"./modules/toType.js":5}],3:[function(require,module,exports){
+module.exports = function(struct) {
 	var normalized = [];
 
 	switch (this.toType(struct)) {
@@ -27,8 +83,8 @@ nerve.normalize = function(struct) {
 				var obj = struct[i];
 
 				for (var key in obj) {
-					var parsed = nerve.parse.css.selector(key);
-					parsed.inner = nerve.normalize(obj[key]);
+					var parsed = this.parse.css.selector(key);
+					parsed.inner = this.normalize(obj[key]);
 				}
 
 				normalized.push(parsed)
@@ -45,30 +101,41 @@ nerve.normalize = function(struct) {
 				obj[key] = val;
 
 				for (var keyS in obj) {
-					var parsed = nerve.parse.css.selector(keyS);
-					parsed.inner = nerve.normalize(struct[keyS]);
+					var parsed = this.parse.css.selector(keyS);
+					parsed.inner = this.normalize(struct[keyS]);
 				}
 
 				normalized.push(parsed);
 			}
 			break;
 		case 'function':
-			// console.log('found a function', struct)
-			// normalized.push(nerve.parse.functions.normalize(struct));
+			console.log('found a function', struct);
+
+			// here we set the returned object as the result of whatever the function ran,
+			// resulting in a structure that should also be normalized
+
+			// we call this as the current context, assuming that this is a component
+			normalized = this.normalize( struct.call(this) );
+
 			break;
 		case 'component':
+			console.log('found a component');
 
-			struct['parent'] = nerve.component;
+			// for components we push a parent reference
+			struct['parent'] = this;
 
-			nerve.component.children.push(struct);
+			// we push to a children array for convenient references
+			this.children.push(struct);
+
+			// we push to the normalized template
+			normalized.push( struct );
+
 			break;
 	}
 
 	return normalized;
 }
-
-
-},{"./modules/parse/css.js":2}],2:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 module.exports = {
 	selector: function(string) {
 		// parse a CSS selector and normalize it as a a JS object
@@ -222,4 +289,14 @@ module.exports = {
 		return parsed;
 	}
 }
-},{}]},{},[1]);
+},{}],5:[function(require,module,exports){
+module.exports = function(obj) {
+	// better type checking
+	// https://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/
+	if (obj.hasOwnProperty('type') && obj.type === 'component') {
+		return 'component';
+	} else {
+		return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+	}
+}
+},{}]},{},[2]);
