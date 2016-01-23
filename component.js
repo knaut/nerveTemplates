@@ -23,6 +23,7 @@ Component = function(obj) {
 methods = {
 	initialize: function() {
 		this.normalized = this.normalize( this.template );
+		this.stringified = this.stringify.normalized( this.normalized );
 	}
 }
 

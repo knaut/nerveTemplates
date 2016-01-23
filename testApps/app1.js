@@ -23,16 +23,16 @@ var child2 = Component.extend({
 });
 
 testComp = new Component({
-	data: false,
+	data: {
+		foo: 'bar'
+	},
 
 	template: {
 		div: function() {
-			if (this.data) {
-				return new child1({
-					data: true
-				});
-			} else {
-				return new child2
+			return {
+				li: new child1({
+					data: false
+				})
 			}
 		}
 	}

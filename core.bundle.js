@@ -19,7 +19,7 @@ module.exports = function(struct) {
 			return struct;
 			break;
 		case 'array':
-			console.log('found an array')
+			// console.log('found an array')
 			// normalized = struct;
 
 			// this is uninintuitive but works because of recursion
@@ -66,7 +66,7 @@ module.exports = function(struct) {
 			}
 			break;
 		case 'function':
-			console.log('found a function', struct);
+			// console.log('found a function', struct);
 
 			// here we set the returned object as the result of whatever the function ran,
 			// resulting in a structure that should also be normalized
@@ -76,7 +76,7 @@ module.exports = function(struct) {
 
 			break;
 		case 'component':
-			console.log('found a component');
+			// console.log('found a component');
 
 			// for components we push a parent reference
 			struct['parent'] = this;
