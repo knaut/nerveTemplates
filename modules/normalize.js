@@ -72,7 +72,10 @@ module.exports = function(struct) {
 			this.children.push(struct);
 
 			// we push to the normalized template
-			normalized.push( struct );
+			// or, we could just set the normalized array as the next component structure
+			// depends if we want the component's api in normalized object
+			normalized = struct.normalized;
+			// normalized.push( struct );
 
 			break;
 	}

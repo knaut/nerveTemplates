@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Nerve Testing</title>
+</head>
+	<!-- Dependencies -->
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+
+	<!-- Src includes -->
+
+	<script type="text/javascript" src="../app1.bundle.js"></script>
+	
+
+	<!-- Spec includes -->
+	<!-- <script type="text/javascript" src="tests/toType_spec.js"></script>
+	// <script type="text/javascript" src="tests/parseCSSKey_spec.js"></script>
+	// <script type="text/javascript" src="tests/parseFunctions_spec.js"></script> -->
+	<!-- <script type="text/javascript" src="tests/normalize_spec.js"></script> -->
+
+	<script>
+		// set underscore to recognize nerve syntax
+		_.templateSettings = {
+			evaluate: /\<\<([\s\S]+?)\>\>/g, 
+			interpolate: /\~\~([\s\S]+?)\~\~/g, 
+			escape: /\-\-([\s\S]+?)\-\-/g
+		}
+	</script>
+	
+<body>
+	<h1>Test until it gets on your nerves.</h1>
+
+</body>
+</html>
