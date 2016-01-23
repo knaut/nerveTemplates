@@ -15,9 +15,17 @@ Component = function(obj) {
 	if (!this['data']) {
 		this.data = {}
 	}
+
+	this.normalized = null;
+
+	this.initialize();
 }
 
-Component.prototype = {}
+Component.prototype = {
+	initialize: function() {
+		this.normalized = this.normalize( this.template );
+	}
+}
 
 // we need to use the nerve object like a mixin
 // every component should have access to its library
