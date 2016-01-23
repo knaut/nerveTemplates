@@ -1,4 +1,4 @@
-var nerve = {};
+nerve = {};
 
 nerve.parse = {};
 nerve.parse.css = require('./modules/parse/css.js');
@@ -52,7 +52,8 @@ nerve.normalize = function(struct) {
 			}
 			break;
 		case 'function':
-			normalized.push(nerve.parse.functions.normalize(struct));
+			// console.log('found a function', struct)
+			// normalized.push(nerve.parse.functions.normalize(struct));
 			break;
 		case 'component':
 
