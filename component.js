@@ -1,3 +1,6 @@
+var _ = require('underscore');
+var extend = require('./extend.js');
+
 Component = function(obj) {
 	for (var prop in obj) {
 		this[prop] = obj[prop];
@@ -17,10 +20,11 @@ Component = function(obj) {
 
 	this.normalized = null;
 
-	this.initialize();
+	// this.initialize();
+	this.initialize.apply(this, arguments);
 }
 
-Component.prototype = {
+methods = {
 	initialize: function() {
 		this.normalized = this.normalize( this.template );
 	}
@@ -32,5 +36,9 @@ Component.prototype = {
 for (var prop in nerve) {
 	Component.prototype[prop] = nerve[prop];
 }
+
+_.extend(Component.prototype, methods);
+
+Component.extend = extend;
 
 module.exports = Component;

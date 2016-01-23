@@ -6,17 +6,33 @@ module.exports = function(struct) {
 			return struct;
 			break;
 		case 'array':
-			for (var i = 0; struct.length > i; i++) {
+			console.log('found an array')
+			// normalized = struct;
 
-				var obj = struct[i];
+			// this is uninintuitive but works because of recursion
 
-				for (var key in obj) {
-					var parsed = this.parse.css.selector(key);
-					parsed.inner = this.normalize(obj[key]);
-				}
-
-				normalized.push(parsed)
+			// when we loop, we push to the normalized struct (component's) children
+			for (var x = 0; struct.length > x; x++) {
+				normalized.push = this.normalize(struct[x]);
 			}
+
+			// by setting normalized to the struct, we return the array for normalized templates
+			normalized = struct;
+
+			// old code when we assumed every array held an object with a css key
+			// still want to test
+			// for (var i = 0; struct.length > i; i++) {
+
+			// 	var obj = struct[i];
+
+			// 	for (var key in obj) {
+			// 		var parsed = this.parse.css.selector(key);
+			// 		parsed.inner = this.normalize(obj[key]);
+			// 	}
+
+			// 	normalized.push(parsed)
+			// }
+
 			break;
 		case 'object':
 			var keys = Object.keys(struct);
