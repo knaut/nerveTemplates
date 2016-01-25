@@ -6,32 +6,33 @@ module.exports = function(struct) {
 			return struct;
 			break;
 		case 'array':
-			// console.log('found an array')
-			// normalized = struct;
 
-			// this is uninintuitive but works because of recursion
+			// for component based library (Ulna), check if we're mixed into the component
+			// prototype, and depend on its api
+			if (this.type === 'component') {
+				// this is uninintuitive but works because of recursion
+				// when we loop, we push to the normalized struct (component's) children	
+				for (var x = 0; struct.length > x; x++) {
+					normalized.push = this.normalize(struct[x]);
+				}
 
-			// when we loop, we push to the normalized struct (component's) children
-			for (var x = 0; struct.length > x; x++) {
-				normalized.push = this.normalize(struct[x]);
+				// by setting normalized to the struct, we return the array for normalized templates
+				normalized = struct;
+			} else {
+				// code where we assume every array holds another nerve template object
+				// still want to test
+				for (var i = 0; struct.length > i; i++) {
+
+					var obj = struct[i];
+
+					for (var key in obj) {
+						var parsed = this.parse.css.selector(key);
+						parsed.inner = this.normalize(obj[key]);
+					}
+
+					normalized.push(parsed)
+				}
 			}
-
-			// by setting normalized to the struct, we return the array for normalized templates
-			normalized = struct;
-
-			// old code when we assumed every array held an object with a css key
-			// still want to test
-			// for (var i = 0; struct.length > i; i++) {
-
-			// 	var obj = struct[i];
-
-			// 	for (var key in obj) {
-			// 		var parsed = this.parse.css.selector(key);
-			// 		parsed.inner = this.normalize(obj[key]);
-			// 	}
-
-			// 	normalized.push(parsed)
-			// }
 
 			break;
 		case 'object':
@@ -59,7 +60,7 @@ module.exports = function(struct) {
 			// resulting in a structure that should also be normalized
 
 			// we call this as the current context, assuming that this is a component
-			normalized = this.normalize( struct.call(this) );
+			normalized = this.normalize(struct.call(this));
 
 			break;
 		case 'component':
@@ -68,6 +69,7 @@ module.exports = function(struct) {
 			// for components we push a parent reference
 			struct['parent'] = this;
 
+			// assuming refactored Ulna api
 			// we push to a children array for convenient references
 			this.children.push(struct);
 

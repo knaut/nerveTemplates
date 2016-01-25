@@ -2,8 +2,7 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		browserify: {
-			'core.bundle.js': ['core.js'],
-			'app1.bundle.js': ['testApps/app1.js']
+			'core.bundle.js': ['core.js']
 		},
 		watch: {
 			files: [

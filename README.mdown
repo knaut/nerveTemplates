@@ -3,6 +3,15 @@ Write HTML templates as Javascript data structures. Use CSS selectors to describ
 
 WIP Warning: Nerve is a work in progress. Use at your own risk.
 
+# Give me
+	
+	npm install nerve-templates
+
+The nerve object is a simple object containing methods designed to be used together.
+It is designed to be mixed into another component or view library, but its API can also be used independently.
+
+A browserified core.bundle.js file is supplied that can be loaded client-side.
+
 # The Nutshell
 
 Take something like this, where the keys of an object literal are CSS selectors, and the values may be objects, arrays, or strings for interpolation or otherwise:
@@ -21,7 +30,7 @@ Take something like this, where the keys of an object literal are CSS selectors,
 
 Turn it into an HTML template we could hand to something like Underscore, assuming that double tildes mark variable interpolation:
 
-	var string = nerve.render( template );
+	var string = nerve.stringify.normalized( nerve.normalize( template ) );
 
 	// string outputs: '<div class="some-class-1"><ul class="my-list" data-attr="custom"><li>Favorite Show: ~~foo~~</li><li>Other Favorite Show: ~~bar~~</li></div>'
 
@@ -89,13 +98,9 @@ We can use arrays to get around this if we need multiple elements with the same 
 		{ li: 'bar' }
 	]
 
-	// "<li>foo</li><li>bar</li>"
+	// <li>foo</li><li>bar</li>
 
-# Current Status
-12/31/15: the modules as loaded in SpecRunner.html can be implemented as such:
-
-	nerve.render( testStructure );
-
+How deep?
 A test structure as complex as this:
 
 	testStructure = [{
@@ -148,63 +153,64 @@ Will yield:
 ## Inline Scripting
 
 Templates need logic. What if we use functions to embed logic in our templates?
-
-Assuming a templating syntax like ~~ interpolate ~~ and << evaluate >>
 	
 	template = {
-		'div.blah': function() {
-			if (message) {
+		'div.foo': function() {
+			if (this.data) {
 				return {
-					span: '~~message~~'
+					span: this.data
 				}
 			} else {
 				return {
-					span: 'bob'
+					span: 'not sure'
 				}
 			}
 		}
 	}
 
-Yields:
+	nerve.stringify.normalized( nerve.normalize(template) ); 
 
-	<div class="foo">
-		<<if(message){>>
-			<span>~~message~~</span>
-		<<}else{>>
-			<span>bar</span>
-		<<}>>
-	</div>
+Outputs:
 
-Given an Underscore-like templating function and data object:
+	<div class="foo"><span>not sure</span></div>
 
-	render({
-		message: 'moe'
-	})
+The methods in the nerve object are designed to be mixed into a larger component/view library.
+Given a Component instance where we want to render some state object:
 
-Yields:
+	var myTest = new Component({
+		data: true,
 
-	<div class="foo">
-		<span>moe</span>
-	</div>
+		template: {
+			'div#test': function() {
+				if (this.data) {
+					return {
+						span: this.data
+					}
+				} else {
+					return {
+						span: 'nevermore'
+					}
+				}
+			}
+		}
+	});
 
-The functions are parsed as strings. They don't take arguments and are never executed. They are just containers for logic that will be inlined later. Return blocks are delimiters for where the parser should begin reading the enclosed object as HTML again. At the moment, only objects can be returned in functions.
+	myTest.stringify.normalized( myTest.normalize( template ) );
 
-We should be able to recursively render as many nested structures as we want.
+Should output as a string:
+	
+	<div class="test">true</div>
+
+In a previous version of nerve-templates, functions were parsed as strings. This is no longer the case. Functions run during a template's normalization, but bind "this" to a parent instance. This allows the template to grab properties from the instance, or other variables in scope, by reference.
+
+The idea is give the developer the full power of javascript within their templates. Logic gets run when a template is normalized. Since we stringify after that, we don't need to interpolate or evaluate anything via underscore-style microtemplates. 
+
+The idea is to achieve something like JSX without the commitment to XML syntax.
+
+Nerve templates are being developed in conjunction with a refactored version of Ulna to achieve this.
 
 ## API
-SpecRunner.html includes an example of the modules being loaded in a simple html file independently. Distributed script files are coming soonish.
-
 ### Core
-#### nerve.render( templateStruct )
-
-	var templateStruct = { div: 'blah' }
-
-	// <div>blah</div>
-
-Render is a shorthand method for normalizing and stringifying a template structure. It's equivalent to:
-	
-	nerve.stringify.normalized( nerve.normalize( templateStruct ) );
-
 #### nerve.normalize( templateStruct )
 
 Parse a nested structure and return a more accessible version of itself that we can manipulate or stringify.
@@ -230,7 +236,7 @@ Parse a nested structure and return a more accessible version of itself that we 
 		}
 	]
 
-Nested structures are recursively placed in the inner property, which is either an array or a string. The custom 'type' property is used for better type checking. In another library could we could use it to detect nested components.
+Nested structures are recursively placed in the inner property, which is either an array or a string. The custom 'type' property is used for easier type checking. We can also use it to check for custom types like components.
 
 #### nerve.stringify 
 
@@ -240,18 +246,15 @@ Container for stringification methods.
 
 Takes a normalized structure (see above) and outputs the html equivalent. It relies on the rest of the stringification module, and is the main entrance point for stringifying a nested object.
 
-#### nerve.parse, nerve.parse.css, nerve.parse.functions
+#### nerve.parse, nerve.parse.css
 
-Containers for parsing CSS selectors and anonymous functions. They are submodules that are used by the higher functions for parsing keys and values as we traverse the template structure.
+Containers for parsing CSS selectors and other template schemes.
 
 ## Todos
-Isolate and modularize functions.
-Testability. Eliminating edge cases.
+Interpolating props in key selectors when dealing with components.
+Testability. Expose edge cases.
+Keep functions isolated and modularized.
 Parsing configuration / alternate syntaxes.
-Packages / minified script files.
-Accessing properties of a component ala JSX: this.props.someProp
-
-Should be able to nest components within templates and have them render their templates in context. We're working on a refactored branch of Ulna to achieve this.
 
 # License
 

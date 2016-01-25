@@ -1,6 +1,6 @@
 {
   "name": "nerve-templates",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "writing HTML templates as Javascript data structures",
   "main": "core.js",
   "directories": {
@@ -28,8 +28,5 @@
     "grunt": "^0.4.5",
     "grunt-browserify": "^4.0.1",
     "grunt-contrib-watch": "^0.6.1"
-  },
-  "dependencies": {
-    "underscore": "^1.8.3"
   }
 }
