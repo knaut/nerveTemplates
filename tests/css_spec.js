@@ -9,8 +9,6 @@ var testSelectors = [
 ];
 
 var testSelector = function( selector ) {
-	
-	var nerve = new Nerve();
 
 	var parsed = nerve.parse.css.selector( selector );
 

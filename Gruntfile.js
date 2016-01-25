@@ -8,11 +8,8 @@ module.exports = function(grunt) {
 		watch: {
 			files: [
 				'core.js',
-				'component.js',
 				'modules/*.js',
-				'modules/**/*.js',
-				'testApps/*.js',
-				'testApps/*.html'
+				'modules/**/*.js'
 			],
 			tasks: [
 				'browserify'

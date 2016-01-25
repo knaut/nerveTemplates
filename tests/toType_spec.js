@@ -1,7 +1,5 @@
 describe( 'toType', function() {
 
-	var nerve = new Nerve();
-
 	it( 'should return a string of the object\'s type', function() {
 
 		// array
