@@ -2074,27 +2074,8 @@ module.exports = function(obj) {
 },{}],9:[function(require,module,exports){
 var Component = require('../component.js');
 
-var child1 = Component.extend({
-	template: {
-		'#someId': function() {
-			if (!this.data) {
-				return {
-					div: 'wat!!!!'
-				}
-			} else {
-				return {
-					div: ''
-				}
-			}
-		}
-	}
-});
+var child1 = require('./child1.js');
 
-var child2 = Component.extend({
-	template: {
-		'#someOtherId': 'foo'
-	}
-});
 
 testComp = new Component({
 	data: {
@@ -2131,4 +2112,22 @@ testComp2 = new Component({
 		}
 	}
 });
-},{"../component.js":1}]},{},[9]);
+},{"../component.js":1,"./child1.js":10}],10:[function(require,module,exports){
+var child1 = Component.extend({
+	template: {
+		'#someId': function() {
+			if (this.data) {
+				return {
+					div: 'wat!!!!'
+				}
+			} else {
+				return {
+					div: ''
+				}
+			}
+		}
+	}
+});
+
+module.exports = child1;
+},{}]},{},[9]);
