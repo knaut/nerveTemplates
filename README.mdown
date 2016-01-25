@@ -100,7 +100,7 @@ We can use arrays to get around this if we need multiple elements with the same 
 
 	// <li>foo</li><li>bar</li>
 
-How deep?
+#Nested Structures
 A test structure as complex as this:
 
 	testStructure = [{
@@ -150,8 +150,7 @@ Will yield:
 	    </div>
 	</div>
 
-## Inline Scripting
-
+# Inline Scripting
 Templates need logic. What if we use functions to embed logic in our templates?
 	
 	template = {
@@ -203,15 +202,15 @@ Should output as a string:
 
 In a previous version of nerve-templates, functions were parsed as strings. This is no longer the case. Functions run during a template's normalization, but bind "this" to a parent instance. This allows the template to grab properties from the instance, or other variables in scope, by reference.
 
-The idea is give the developer the full power of javascript within their templates. Logic gets run when a template is normalized. Since we stringify after that, we don't need to interpolate or evaluate anything via underscore-style microtemplates. 
+The idea is give the developer the full power of javascript within their templates. Logic gets run when a template is normalized. Since we stringify after that, we don't need underscore-style microtemplates or helper methods.
 
 The idea is to achieve something like JSX without the commitment to XML syntax.
 
 Nerve templates are being developed in conjunction with a refactored version of Ulna to achieve this.
 
-## API
-### Core
-#### nerve.normalize( templateStruct )
+# API
+## Core
+### nerve.normalize( templateStruct )
 
 Parse a nested structure and return a more accessible version of itself that we can manipulate or stringify.
 
@@ -238,19 +237,19 @@ Parse a nested structure and return a more accessible version of itself that we 
 
 Nested structures are recursively placed in the inner property, which is either an array or a string. The custom 'type' property is used for easier type checking. We can also use it to check for custom types like components.
 
-#### nerve.stringify 
+### nerve.stringify 
 
 Container for stringification methods. 
 
-##### nerve.stringify.normalized( normalizedStruct )
+#### nerve.stringify.normalized( normalizedStruct )
 
 Takes a normalized structure (see above) and outputs the html equivalent. It relies on the rest of the stringification module, and is the main entrance point for stringifying a nested object.
 
-#### nerve.parse, nerve.parse.css
+### nerve.parse, nerve.parse.css
 
 Containers for parsing CSS selectors and other template schemes.
 
-## Todos
+# Todos
 Interpolating props in key selectors when dealing with components.
 Testability. Expose edge cases.
 Keep functions isolated and modularized.
