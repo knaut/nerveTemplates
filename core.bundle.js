@@ -268,17 +268,9 @@ module.exports = {
 				case 'object':
 					string += this.object(normalized[n]);
 					break;
-				case 'string':
-					console.log('let me know', normalized);
-					break;
 				case 'component':
-				
 					// seriously
 					string += this.normalized( normalized[n].normalized );
-
-					break;
-				case 'array':
-					console.log('array', normalized)
 					break;
 			}
 		}
@@ -300,35 +292,6 @@ module.exports = {
 		}
 		return string;
 	},
-
-	// deprecating
-	// func: function(obj) {
-	// 	// can be moved to a global config later
-	// 	var delimiters = {
-	// 		evaluate: ['<<', '>>'],
-	// 		interpolate: ['~~', '~~'],
-	// 		escape: ['--', '--'],
-	// 		srcBreak: '%break%'
-	// 	}
-
-	// 	var splitSrc = obj.src.split(delimiters.srcBreak);
-
-	// 	var string = '';
-
-	// 	// we loop based on the number of returned inner blocks
-	// 	for (var s = 0; obj.inner.length > s; s++) {
-	// 		// enclose the split src strings in evaluation brackets
-	// 		string += delimiters.evaluate[0] + splitSrc[s] + delimiters.evaluate[1];
-
-	// 		// we don't use stringify() here because that will cause unnecessary nested loops
-	// 		// we also know its type, so we can stringify it directly
-	// 		string += this.html(obj.inner[s]);
-	// 	}
-	// 	// we can assume there will be an ending bracket in most control structures
-	// 	string += delimiters.evaluate[0] + splitSrc[s] + delimiters.evaluate[1];
-
-	// 	return string;
-	// },
 
 	html: function(obj) {
 		var string = '<' + obj.tagName;
@@ -367,13 +330,11 @@ module.exports = {
 
 		// end the opening tag
 		string += '>';
-		console.log(obj.inner)
 		var innerType = nerve.toType(obj.inner);
 		if (obj.hasOwnProperty('inner') && innerType === 'array' && innerType !== 'string') {
 			string += this.normalized(obj.inner);
 		} else if (innerType === 'string' || innerType === 'number') {
 			string += obj.inner;
-			console.log(string)
 		}
 
 		string += '</' + obj.tagName + '>';
