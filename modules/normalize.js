@@ -5,6 +5,9 @@ module.exports = function(struct) {
 		case 'string':
 			return struct;
 			break;
+		case 'number':
+			return struct;
+			break;
 		case 'array':
 
 			// for component based library (Ulna), check if we're mixed into the component

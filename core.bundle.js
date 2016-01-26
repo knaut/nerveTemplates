@@ -18,6 +18,9 @@ module.exports = function(struct) {
 		case 'string':
 			return struct;
 			break;
+		case 'number':
+			return struct;
+			break;
 		case 'array':
 
 			// for component based library (Ulna), check if we're mixed into the component
@@ -364,11 +367,13 @@ module.exports = {
 
 		// end the opening tag
 		string += '>';
-
-		if (obj.hasOwnProperty('inner') && obj.inner.length && nerve.toType(obj.inner) !== 'string') {
+		console.log(obj.inner)
+		var innerType = nerve.toType(obj.inner);
+		if (obj.hasOwnProperty('inner') && innerType === 'array' && innerType !== 'string') {
 			string += this.normalized(obj.inner);
-		} else if (nerve.toType(obj.inner) === 'string') {
+		} else if (innerType === 'string' || innerType === 'number') {
 			string += obj.inner;
+			console.log(string)
 		}
 
 		string += '</' + obj.tagName + '>';
