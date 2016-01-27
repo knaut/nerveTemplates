@@ -11,24 +11,30 @@ module.exports = function(struct) {
 		case 'array':
 
 			// for component based library (Ulna), check if we're mixed into the component
-			// prototype, and depend on its api
+			// prototype, and assume on its api
 			if (this.type === 'component') {
 				// this is uninintuitive but works because of recursion
-				// when we loop, we push to the normalized struct (component's) children	
+				// when we loop, we push to the normalized struct (component's) children
 				for (var x = 0; struct.length > x; x++) {
 					normalized.push = this.normalize(struct[x]);
 				}
 
+				// we're still in this seperate function process
 				// by setting normalized to the struct, we return the array for normalized templates
 				normalized = struct;
+
 			} else {
+				
 				// code where we assume every array holds another nerve template object
-				// still want to test
 				for (var i = 0; struct.length > i; i++) {
 
 					var obj = struct[i];
 
 					for (var key in obj) {
+
+						// check for interpolated keys
+						key = this.interpolate( key );
+
 						var parsed = this.parse.css.selector(key);
 						parsed.inner = this.normalize(obj[key]);
 					}
@@ -49,8 +55,21 @@ module.exports = function(struct) {
 				obj[key] = val;
 
 				for (var keyS in obj) {
-					var parsed = this.parse.css.selector(keyS);
-					parsed.inner = this.normalize(struct[keyS]);
+
+					// check for interpolatable keys
+					if (key.indexOf('<<') > -1 && key.indexOf('>>') > -1) {
+
+						var interpolatedKey = this.interpolate( keyS );
+						struct[interpolatedKey] = struct[keyS];
+						
+						delete struct[keyS];
+
+						var parsed = this.parse.css.selector(interpolatedKey);
+						parsed.inner = this.normalize(struct[interpolatedKey]);
+					} else {
+						var parsed = this.parse.css.selector(keyS);
+						parsed.inner = this.normalize(struct[keyS]);
+					}
 				}
 
 				normalized.push(parsed);

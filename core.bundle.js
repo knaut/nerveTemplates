@@ -8,9 +8,39 @@ nerve.parse.css = require('./modules/parse/css.js');
 nerve.toType = require('./modules/toType.js')
 nerve.normalize = require('./modules/normalize.js');
 nerve.stringify = require('./modules/stringify.js');
+nerve.interpolate = require('./modules/interpolate.js');
 
 module.exports = nerve;
-},{"./modules/normalize.js":2,"./modules/parse/css.js":3,"./modules/stringify.js":4,"./modules/toType.js":5}],2:[function(require,module,exports){
+},{"./modules/interpolate.js":2,"./modules/normalize.js":3,"./modules/parse/css.js":4,"./modules/stringify.js":5,"./modules/toType.js":6}],2:[function(require,module,exports){
+module.exports = function(key) {
+	// extract stringified refs based on a custom syntax
+	var reg = /\<\<([a-zA-Z|\.]*)\>\>/g;
+	var arr = key.match(reg);
+
+	// loop through the references
+	for (var a = 0; arr.length > a; a++) {
+
+		// better regexing, or passing a handler to replace, might save us this cleanup dance
+		var ref = arr[a].replace(/[\<*|\>*]/g, '');
+
+		// we could eval here
+		// instead we'll construct a custom function that only returns based on type (for security concerns)
+		// then we'll call that in the context of the current object we're mixed into
+		var interpolatedRef = (new Function(
+			// only strings and numbers should be acceptable as references
+			'if (typeof ' + ref + ' === \'string\' || typeof ' + ref + ' === \'number\') { ' +
+				'return ' + ref +
+			'} else {' +
+				'throw new Error("Bad reference encountered while interpolating template:", ' + ref + ');' +
+			'}')).call(this);
+
+		// replace each found reference in our array with its interpolated equivalent
+		key = key.replace(arr[a], interpolatedRef)
+	}
+
+	return key;
+}
+},{}],3:[function(require,module,exports){
 module.exports = function(struct) {
 	var normalized = [];
 
@@ -24,24 +54,30 @@ module.exports = function(struct) {
 		case 'array':
 
 			// for component based library (Ulna), check if we're mixed into the component
-			// prototype, and depend on its api
+			// prototype, and assume on its api
 			if (this.type === 'component') {
 				// this is uninintuitive but works because of recursion
-				// when we loop, we push to the normalized struct (component's) children	
+				// when we loop, we push to the normalized struct (component's) children
 				for (var x = 0; struct.length > x; x++) {
 					normalized.push = this.normalize(struct[x]);
 				}
 
+				// we're still in this seperate function process
 				// by setting normalized to the struct, we return the array for normalized templates
 				normalized = struct;
+
 			} else {
+				
 				// code where we assume every array holds another nerve template object
-				// still want to test
 				for (var i = 0; struct.length > i; i++) {
 
 					var obj = struct[i];
 
 					for (var key in obj) {
+
+						// check for interpolated keys
+						key = this.interpolate( key );
+
 						var parsed = this.parse.css.selector(key);
 						parsed.inner = this.normalize(obj[key]);
 					}
@@ -62,8 +98,21 @@ module.exports = function(struct) {
 				obj[key] = val;
 
 				for (var keyS in obj) {
-					var parsed = this.parse.css.selector(keyS);
-					parsed.inner = this.normalize(struct[keyS]);
+
+					// check for interpolatable keys
+					if (key.indexOf('<<') > -1 && key.indexOf('>>') > -1) {
+
+						var interpolatedKey = this.interpolate( keyS );
+						struct[interpolatedKey] = struct[keyS];
+						
+						delete struct[keyS];
+
+						var parsed = this.parse.css.selector(interpolatedKey);
+						parsed.inner = this.normalize(struct[interpolatedKey]);
+					} else {
+						var parsed = this.parse.css.selector(keyS);
+						parsed.inner = this.normalize(struct[keyS]);
+					}
 				}
 
 				normalized.push(parsed);
@@ -100,7 +149,7 @@ module.exports = function(struct) {
 
 	return normalized;
 }
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 module.exports = {
 	selector: function(string) {
 		// parse a CSS selector and normalize it as a a JS object
@@ -254,7 +303,7 @@ module.exports = {
 		return parsed;
 	}
 }
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 module.exports = {
 	normalized: function(normalized) {
 		// let one do function do one thing:
@@ -342,7 +391,7 @@ module.exports = {
 		return string;
 	}
 }
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = function(obj) {
 	// better type checking
 	// https://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/

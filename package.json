@@ -1,6 +1,6 @@
 {
   "name": "nerve-templates",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "writing HTML templates as Javascript data structures",
   "main": "core.js",
   "directories": {

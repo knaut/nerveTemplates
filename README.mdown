@@ -174,7 +174,7 @@ Outputs:
 	<div class="foo"><span>not sure</span></div>
 
 The methods in the nerve object are designed to be mixed into a larger component/view library.
-Given a Component instance where we want to render some state object:
+Let's assume such a library. Give a Component instance where we want to render some state object:
 
 	var myTest = new Component({
 		data: true,
@@ -194,19 +194,59 @@ Given a Component instance where we want to render some state object:
 		}
 	});
 
-	myTest.stringify.normalized( myTest.normalize( template ) );
+	myTest.stringify.normalized( myTest.normalize( myTest.template ) );
 
 Should output as a string:
 	
 	<div class="test">true</div>
 
-In a previous version of nerve-templates, functions were parsed as strings. This is no longer the case. Functions run during a template's normalization, but bind "this" to a parent instance. This allows the template to grab properties from the instance, or other variables in scope, by reference.
+Functions run during a template's normalization, but bind "this" to a parent instance. This allows the template to grab properties from the instance, or other variables in scope, by reference.
 
-The idea is give the developer the full power of javascript within their templates. Logic gets run when a template is normalized. Since we stringify after that, we don't need underscore-style microtemplates or helper methods.
+It also offers a workaround for dealing with context in nested objects.
 
-The idea is to achieve something like JSX without the commitment to XML syntax.
+	var myTest = new Component({
+		data: 'my nested datum',
 
-Nerve templates are being developed in conjunction with a refactored version of Ulna to achieve this.
+		template: {
+			div: {
+				div: {
+					div: function() {
+						return this.data
+					}
+				}
+			}
+		}
+	});
+
+	myTest.stringify.normalized( myTest.normalize( myTest.template ) );
+
+	// <div><div><div>my nested datum</div></div></div>
+
+The idea is give the developer the full power of Javascript within their templates. Logic gets run when a template is normalized. Since we stringify after that, we don't need underscore-style microtemplates or helper methods.
+
+# Interpolating Data in Keys
+
+Let's still assume our psuedo-Component library. What if we want to render a custom attribute with some dynamic data property?
+
+Assuming that we use double brackets for marking references for interpolation:
+
+	var myTest = new Component({
+		data: {
+			id: 'my-custom-id'
+		},
+
+		template: {
+			'div#<<this.data.id>>': 'should have a unique id'
+		}
+	});
+
+	myTest.stringify.normalized( myTest.normalize( myTest.template ) );
+
+Should output as a string:
+
+	<div id="my-custom-id">should have a unique id</div>
+
+This is particularly useful for rendering image "src" attributes and other potentially dynamic properties.
 
 # API
 ## Core
@@ -249,8 +289,11 @@ Takes a normalized structure (see above) and outputs the html equivalent. It rel
 
 Containers for parsing CSS selectors and other template schemes.
 
+### nerve.interpolate
+
+Used to render in-context variable references in keys when demarked with double brackets (eg. <<this.data.foo>>). Custom syntaxes may be supported in the future.
+
 # Todos
-Interpolating props in key selectors when dealing with components.
 Testability. Expose edge cases.
 Keep functions isolated and modularized.
 Parsing configuration / alternate syntaxes.
