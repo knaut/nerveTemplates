@@ -52,19 +52,17 @@ module.exports = function(struct) {
 			return struct;
 			break;
 		case 'array':
-
 			// for component based library (Ulna), check if we're mixed into the component
 			// prototype, and assume on its api
 			if (this.type === 'component') {
 				// this is uninintuitive but works because of recursion
 				// when we loop, we push to the normalized struct (component's) children
 				for (var x = 0; struct.length > x; x++) {
-					normalized.push = this.normalize(struct[x]);
+					normalized.push( this.normalize(struct[x])[0] );	// normalized always returns an array
 				}
 
-				// we're still in this seperate function process
 				// by setting normalized to the struct, we return the array for normalized templates
-				normalized = struct;
+				// normalized = struct;
 
 			} else {
 				
@@ -130,6 +128,8 @@ module.exports = function(struct) {
 
 			// we call this as the current context, assuming that this is a component
 			normalized = this.normalize(struct.call(this));
+
+			// console.log(normalized, struct.call(this));
 
 			break;
 		case 'component':
