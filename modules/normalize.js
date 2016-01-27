@@ -60,7 +60,6 @@ module.exports = function(struct) {
 					if (key.indexOf('<<') > -1 && key.indexOf('>>') > -1) {
 
 						var interpObj = {};
-						console.log(keyS)
 						var interpolatedKey = this.interpolate( keyS );
 						
 						interpObj[interpolatedKey] = obj[keyS];
