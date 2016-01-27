@@ -59,17 +59,22 @@ module.exports = function(struct) {
 					// check for interpolatable keys
 					if (key.indexOf('<<') > -1 && key.indexOf('>>') > -1) {
 
+						var interpObj = {};
+						console.log(keyS)
 						var interpolatedKey = this.interpolate( keyS );
-						struct[interpolatedKey] = struct[keyS];
 						
-						delete struct[keyS];
+						interpObj[interpolatedKey] = obj[keyS];
+
+						Object.defineProperty( obj, keyS, interpObj);
 
 						var parsed = this.parse.css.selector(interpolatedKey);
-						parsed.inner = this.normalize(struct[interpolatedKey]);
+						parsed.inner = this.normalize(interpObj[interpolatedKey]);
 					} else {
+
 						var parsed = this.parse.css.selector(keyS);
 						parsed.inner = this.normalize(struct[keyS]);
 					}
+					
 				}
 
 				normalized.push(parsed);
