@@ -74,7 +74,8 @@ module.exports = {
 				'h5',
 				'h6',
 				'pre',
-				'em'
+				'em',
+				'img'
 			];
 
 			for (var d = 0; dom.length > d; d++) {

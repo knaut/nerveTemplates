@@ -1,6 +1,5 @@
 module.exports = function(struct) {
 	var normalized = [];
-
 	switch (this.toType(struct)) {
 		case 'string':
 			return struct;
@@ -11,6 +10,7 @@ module.exports = function(struct) {
 		case 'array':
 			// for component based library (Ulna), check if we're mixed into the component
 			// prototype, and assume on its api
+
 			if (this.type === 'component') {
 				// this is uninintuitive but works because of recursion
 				// when we loop, we push to the normalized struct (component's) children

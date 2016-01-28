@@ -43,7 +43,6 @@ module.exports = function(key) {
 },{}],3:[function(require,module,exports){
 module.exports = function(struct) {
 	var normalized = [];
-
 	switch (this.toType(struct)) {
 		case 'string':
 			return struct;
@@ -54,6 +53,7 @@ module.exports = function(struct) {
 		case 'array':
 			// for component based library (Ulna), check if we're mixed into the component
 			// prototype, and assume on its api
+
 			if (this.type === 'component') {
 				// this is uninintuitive but works because of recursion
 				// when we loop, we push to the normalized struct (component's) children
@@ -230,7 +230,8 @@ module.exports = {
 				'h5',
 				'h6',
 				'pre',
-				'em'
+				'em',
+				'img'
 			];
 
 			for (var d = 0; dom.length > d; d++) {
