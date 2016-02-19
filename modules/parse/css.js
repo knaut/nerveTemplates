@@ -57,7 +57,7 @@ module.exports = {
 						
 						var cleanedArr = [];
 						for (var i = 0; classArr.length > i; i++) {
-							console.log(classArr[i].length);
+
 							if (classArr[i].length) {
 								cleanedArr.push(classArr[i]);
 							}
@@ -66,6 +66,7 @@ module.exports = {
 
 					break;
 					default:
+						// console.log(pair)
 						parsed.attrs.push(pair);
 					break;
 				}
@@ -105,7 +106,7 @@ module.exports = {
 		if (tagName.length) {
 			parsed.tagName = tagName;
 		}
-		console.log(parsed)
+
 		return parsed;
 	}
 };

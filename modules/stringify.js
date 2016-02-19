@@ -63,11 +63,20 @@ module.exports = {
 					pair.push(attr[key])
 				}
 
-				pair[1] = '"' + pair[1] + '"';
-				pair = pair.join('=');
+				if (pair[1] === undefined) {
+					
+					string += ' ' + pair[0];
 
-				// we add to the string each time in the loop, accounting for each attr in the array
-				string += ' ' + pair;
+				} else {
+
+					pair[1] = '"' + pair[1] + '"';
+					pair = pair.join('=');
+
+					// we add to the string each time in the loop, accounting for each attr in the array
+					string += ' ' + pair;	
+
+				}
+				
 			}
 		}
 
