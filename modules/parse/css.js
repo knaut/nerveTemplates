@@ -13,7 +13,6 @@ module.exports = {
 				tagName: 'string'
 			}
 		*/
-
 		var parsed = {
 			type: 'html',
 			tagName: 'div', // default element
@@ -21,135 +20,94 @@ module.exports = {
 			classes: [],
 			id: ''
 		};
+		
+		// regexes from CSSUtilities
+		// http://onwebdev.blogspot.com/2011/09/javascript-parsing-css-selectors-with.html
+		var rAttrs = /(\[\s*[_a-z0-9-:\.\|\\]+\s*(?:[~\|\*\^\$]?(=)\s*[\"\'][^\"\']*[\"\'])?\s*\])/gi;
+		
+		var attrs = string.match(rAttrs);
 
-		// check for attributes
-		if (string.indexOf('[') > -1) {
-			parsed.attrs = this.attrs(string);
-		}
+		if (attrs !== null && attrs.length !== 0) {
 
-		// check for classes
-		if (string.indexOf('.') > -1) {
-			parsed.classes = this.classes(string);
-		}
+			// console.log(attrs)
 
-		// check for id
-		if (string.indexOf('#') > -1) {
-			parsed.id = this.id(string);
-		}
+			for (var a = 0; attrs.length > a; a++) {
 
-		// check for tag name
-		if (this.tagName(string)) {
-			parsed.tagName = this.tagName(string);
-		}
+				// parse a single attr string as provided by our loop, ex: [key="3"]
+				var rKey = /\[(\s*[_a-z0-9-:\.\|\\]+\s*)/gi;
+				var rVal = /(?:[~\|\*\^\$]?=\s*[\"\']([^\"\']*)[\"\'])?\s*\]/gi;
 
-		return parsed;
-	},
+				var key = rKey.exec(attrs[a])[1];
+				var val = rVal.exec(attrs[a])[1];
 
-	tagName: function(string) {
-		// parse a selector with an element name
-		var reg = /^\w*/;
-
-		var tag = string.match(reg)[0];
-
-		if (!tag) {
-			return false;
-		} else {
-			// list of supported dom tags
-			var dom = [
-				'div',
-				'a',
-				'p',
-				'span',
-				'ul',
-				'li',
-				'header',
-				'address',
-				'article',
-				'section',
-				'nav',
-				'footer',
-				'h1',
-				'h2',
-				'h3',
-				'h4',
-				'h5',
-				'h6',
-				'pre',
-				'em',
-				'img'
-			];
-
-			for (var d = 0; dom.length > d; d++) {
-				if (dom[d] === tag) {
-					return tag;
-				}
-			}
-		}
-	},
-
-	id: function(string) {
-		// parse a selector with an id
-		// and extract the id
-		var reg = /#[\w|-]*/;
-
-		var id = string.match(reg)[0].substring(1);
-
-		return id;
-	},
-
-	classes: function(string) {
-		// parse a selector with at least one class
-		var reg = /\.[\w|-]*/g;
-
-		var classes = string.match(reg);
-
-		var parsed = [];
-		for (var c = 0; classes.length > c; c++) {
-			// chop off the .
-			var classString = classes[c].substring(1);
-			parsed.push(classString)
-		}
-
-		return parsed;
-	},
-
-	attrs: function(string) {
-		var reg = /\[.+\]/g;
-
-		// we will only accept attributes grouped together in the selector
-		var attrs = string.match(reg);
-
-		// treat the attrs as an array, even if there's only one
-		if (attrs[0].indexOf('][') > -1) {
-			attrs = attrs[0].split('][');
-		}
-
-		// push the parsed pairs to an array for later
-		var parsed = [];
-
-		for (var i = 0; attrs.length > i; i++) {
-
-			// clean up everything
-			var attr = attrs[i].replace(/'|"|\[|\]/g, '');
-
-			// only assume the attr has a key
-			var pair = {};
-			if (attr.indexOf('=') > -1) {
-				var split = attr.split('=');
-				pair = {
-					attrKey: split[0],
-					attrVal: split[1]
+				var pair = {
+					attrKey: key,
+					attrVal: val
 				};
-				parsed.push(pair);
-			} else {
-				pair = {
-					attrKey: attr,
-					attrVal: null
+
+				// assign class or id attributes to parsed object directly
+				switch(pair.attrKey) {
+					case 'id':
+						parsed.id = pair.attrVal;
+					break;
+					case 'class':
+						var classString = pair.attrVal;
+
+						var classArr = classString.match(/[^\s]*/g);
+						
+						var cleanedArr = [];
+						for (var i = 0; classArr.length > i; i++) {
+							console.log(classArr[i].length);
+							if (classArr[i].length) {
+								cleanedArr.push(classArr[i]);
+							}
+						}
+						parsed.classes = cleanedArr;
+
+					break;
+					default:
+						parsed.attrs.push(pair);
+					break;
 				}
-				parsed.push(pair);
 			}
 		}
 
+		// check for id in our selector, if we haven't already got one
+		if (parsed.id === '') {
+			var rId = /#([a-z]+[_a-z0-9-:\\]*)/ig;
+			
+			var id = rId.exec( string );
+			
+			if (id !== null) {
+				parsed.id = id[1];
+			}
+		}
+
+		// check for classes in our selector, if we haven't already got them
+		if (parsed.classes.length === 0) {
+			var rClasses = /(\.[_a-z]+[_a-z0-9-:\\]*)/ig;
+			var classes = string.match(rClasses);
+
+			if (classes !== null) {
+				for (var c = 0; classes.length > c; c++) {
+					classes[c] = classes[c].slice(1)
+				}
+
+				parsed.classes = classes;
+			}
+
+			
+		}
+
+		// get the tag name
+		var rTagName = /(^\w*)/gi;
+		var tagName = string.match(rTagName)[0];
+		if (tagName.length) {
+			parsed.tagName = tagName;
+		}
+		console.log(parsed)
 		return parsed;
 	}
-}
+};
+
+
