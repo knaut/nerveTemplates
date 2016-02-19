@@ -63,6 +63,7 @@ module.exports = {
 				'ul',
 				'li',
 				'header',
+				'address',
 				'article',
 				'section',
 				'nav',
