@@ -20,13 +20,15 @@ module.exports = {
 			classes: [],
 			id: ''
 		};
+
+		var selector = string;
 		
 		// regexes from CSSUtilities
 		// http://onwebdev.blogspot.com/2011/09/javascript-parsing-css-selectors-with.html
 		var rAttrs = /(\[\s*[_a-z0-9-:\.\|\\]+\s*(?:[~\|\*\^\$]?(=)\s*[\"\'][^\"\']*[\"\'])?\s*\])/gi;
 		
 		var attrs = string.match(rAttrs);
-
+		
 		if (attrs !== null && attrs.length !== 0) {
 
 			// console.log(attrs)
@@ -70,6 +72,11 @@ module.exports = {
 						parsed.attrs.push(pair);
 					break;
 				}
+
+				// remove the attributes we've already parsed from our string
+				// this saves us from interpreting ids or classes potentially nested in attributes as such
+				selector = selector.replace(attrs[a], '');
+
 			}
 		}
 
@@ -77,10 +84,14 @@ module.exports = {
 		if (parsed.id === '') {
 			var rId = /#([a-z]+[_a-z0-9-:\\]*)/ig;
 			
-			var id = rId.exec( string );
+			var id = rId.exec( selector );
 			
+			// if none found, exec returns null
 			if (id !== null) {
 				parsed.id = id[1];
+
+				// update our selector
+				selector = selector.replace(id[1], '');
 			}
 		}
 
@@ -92,19 +103,24 @@ module.exports = {
 			if (classes !== null) {
 				for (var c = 0; classes.length > c; c++) {
 					classes[c] = classes[c].slice(1)
+
+					// update our selector
+					selector = selector.replace(classes[c], '');
 				}
 
 				parsed.classes = classes;
 			}
 
-			
+
 		}
 
 		// get the tag name
 		var rTagName = /(^\w*)/gi;
 		var tagName = string.match(rTagName)[0];
+
 		if (tagName.length) {
 			parsed.tagName = tagName;
+			selector = selector.replace(tagName, '');
 		}
 
 		return parsed;
