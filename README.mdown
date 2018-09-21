@@ -1,4 +1,7 @@
 # Nerve
+
+THIS PROJECT IS NO LONGER UNDER DEVELOPMENT.
+
 Write HTML templates as Javascript data structures. Use CSS selectors to describe DOM elements in a hierarchical style like JSON.
 
 WIP Warning: Nerve is a work in progress. Use at your own risk.
